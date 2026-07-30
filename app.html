@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover, maximum-scale=1">
+<title>서유럽 2027</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="서유럽 2027">
+<meta name="theme-color" content="#eef1f4">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<style>
+:root{
+  --ink:#16202b; --slate:#5a6b7a; --paper:#eef1f4; --card:#fff;
+  --frost:#d5dee5; --soft:#e6ebef; --alpine:#2e6e8e; --deep:#1d4f68;
+  --ember:#b64f2b; --emberbg:#f6ece7;
+  --sans:'IBM Plex Sans KR',system-ui,sans-serif;
+  --mono:'IBM Plex Mono','IBM Plex Sans KR',monospace;
+  --serif:'Gowun Batang',serif;
+  --nav:64px;
+}
+@media (prefers-color-scheme:dark){
+  :root{--ink:#e8edf1;--slate:#9aa9b6;--paper:#111a22;--card:#18232d;
+        --frost:#2b3945;--soft:#223039;--alpine:#6aa9c6;--deep:#8fc3da;
+        --ember:#d97a52;--emberbg:#2a1e18;}
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);
+     font-weight:300;font-size:15px;line-height:1.7;overscroll-behavior-y:none}
+.app{max-width:1120px;margin:0 auto;padding:0 24px calc(var(--nav) + env(safe-area-inset-bottom) + 24px)}
+
+header{position:sticky;top:0;z-index:20;background:var(--paper);
+       padding:calc(env(safe-area-inset-top) + 14px) 0 10px;border-bottom:1px solid var(--frost)}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.brand h1{font-family:var(--serif);font-weight:700;font-size:21px;margin:0;letter-spacing:-.01em}
+.count{font-family:var(--mono);font-size:11px;color:var(--alpine);letter-spacing:.06em;text-align:right;line-height:1.5}
+
+.panel{display:none;padding-top:18px}
+.panel.on{display:block;animation:fade .25s ease-out}
+@keyframes fade{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:none}}
+
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--alpine);
+         text-transform:uppercase;margin:0 0 4px}
+h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px;letter-spacing:-.01em}
+h2.sub{margin-top:30px}
+
+.city{background:var(--card);border:1px solid var(--frost);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.chead{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer;user-select:none}
+.cnum{font-family:var(--mono);font-size:11px;color:var(--alpine);flex:0 0 auto}
+.cname{font-family:var(--serif);font-weight:700;font-size:18px;flex:1;line-height:1.2}
+.cmeta{font-family:var(--mono);font-size:10.5px;color:var(--slate);text-align:right;line-height:1.5}
+.caret{flex:0 0 auto;color:var(--slate);font-size:12px;transition:transform .2s}
+.city.open .caret{transform:rotate(90deg)}
+.cbody{display:none;padding:0 16px 14px;border-top:1px solid var(--frost)}
+.city.open .cbody{display:block}
+
+.day{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--soft);align-items:flex-start}
+.day:last-of-type{border-bottom:0}
+.day.now{background:linear-gradient(90deg,var(--soft),transparent);margin:0 -8px;padding-left:8px;padding-right:8px;border-radius:6px}
+.dd{font-family:var(--mono);font-size:11.5px;color:var(--slate);flex:0 0 62px;padding-top:3px}
+.da{flex:1;font-size:14.5px;line-height:1.6}
+.day.move .da{color:var(--deep)}
+.day.move .da::before{content:"→ ";font-family:var(--mono);color:var(--alpine)}
+
+.note{display:flex;gap:10px;margin-top:12px;padding:10px 12px;background:var(--emberbg);
+      border-left:3px solid var(--ember);border-radius:0 6px 6px 0;font-size:13px;line-height:1.6}
+.note b{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--ember);flex:0 0 auto;padding-top:2px}
+.eat{margin:12px 0 0;padding-top:11px;border-top:1px solid var(--frost);font-size:13px;color:var(--slate);line-height:1.65}
+.eat span{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink);display:block;margin-bottom:3px}
+.links{margin:10px 0 0;font-size:13px;line-height:2}
+.links a{display:inline-block;color:var(--deep);text-decoration:none;border:1px solid var(--frost);
+         border-radius:99px;padding:2px 11px;margin:0 5px 5px 0;font-size:12.5px}
+
+.leg{display:flex;align-items:center;gap:9px;padding:6px 0 14px 16px;font-family:var(--mono);
+     font-size:11.5px;color:var(--slate)}
+.leg i{width:2px;height:16px;background:var(--alpine);display:block;border-radius:2px}
+
+.fcard{background:var(--card);border:1px solid var(--frost);border-radius:12px;padding:16px;margin-bottom:12px}
+.frow{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--soft);font-size:14px}
+.frow:last-child{border-bottom:0}
+.frow span:first-child{color:var(--slate);font-size:13px}
+.frow span:last-child{font-family:var(--mono);font-size:13px;text-align:right}
+.seats{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.seat{font-family:var(--mono);font-size:12px;background:var(--ember);color:#fff;
+      border-radius:6px;padding:4px 10px;font-weight:500}
+
+.chk{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--frost);cursor:pointer;align-items:flex-start}
+.chk:last-child{border-bottom:0}
+.box{flex:0 0 20px;height:20px;border:1.5px solid var(--frost);border-radius:5px;margin-top:2px;
+     display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff;transition:.15s}
+.chk.done .box{background:var(--alpine);border-color:var(--alpine)}
+.chk.done .ctext{color:var(--slate);text-decoration:line-through}
+.ctext{flex:1;font-size:14px;line-height:1.6}
+.ctext b{font-weight:500}
+.cwhen{font-family:var(--mono);font-size:11px;color:var(--alpine);display:block;margin-top:2px}
+
+nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);
+    border-top:1px solid var(--frost);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;border:0;padding:9px 0 8px;font-family:var(--sans);
+           font-size:10.5px;color:var(--slate);cursor:pointer;display:flex;flex-direction:column;
+           align-items:center;gap:3px;font-weight:400}
+nav button.on{color:var(--alpine);font-weight:500}
+nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;
+        stroke-linecap:round;stroke-linejoin:round}
+
+.tip{font-size:12.5px;color:var(--slate);line-height:1.7;margin:16px 0 0;
+     padding:12px;background:var(--card);border:1px solid var(--frost);border-radius:10px}
+.map svg{width:100%;height:auto;display:block}
+.mapwrap{background:var(--card);border:1px solid var(--frost);border-radius:12px;padding:14px 8px 8px}
+.legend{font-family:var(--mono);font-size:11px;color:var(--slate);text-align:center;padding:8px 0 2px}
+.share-card{background:var(--card);border:1px solid var(--frost);border-radius:12px;padding:16px;margin-bottom:12px}
+.share-card h3{font-family:var(--serif);font-size:17px;margin:0 0 4px}.share-card p{font-size:13px;color:var(--slate);margin:0 0 12px}
+.tool-row{display:flex;flex-wrap:wrap;gap:8px}.tool-row button,.tool-row label{border:1px solid var(--frost);background:var(--paper);color:var(--ink);border-radius:8px;padding:8px 11px;font:500 12px var(--sans);cursor:pointer}.tool-row .primary{background:var(--alpine);border-color:var(--alpine);color:#fff}
+.collection{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.photo{position:relative;border:1px solid var(--frost);border-radius:12px;overflow:hidden;background:var(--card)}.photo img{display:block;width:100%;height:170px;object-fit:cover;background:var(--soft)}.photo-copy{padding:10px 12px}.photo-copy b{display:block;font-size:14px}.photo-copy a{display:block;color:var(--deep);font-size:12px;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.delete{position:absolute;top:8px;right:8px;width:28px;height:28px;border:0;border-radius:50%;background:#16202bd9;color:#fff;font-size:18px;cursor:pointer}
+.custom-link{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--frost);border-radius:9px;padding:11px 12px;margin:8px 0;background:var(--card)}.custom-link a{color:var(--deep);text-decoration:none;font-size:14px}.custom-link button{border:0;background:none;color:var(--ember);font-size:18px;cursor:pointer}
+dialog{max-width:min(92vw,520px);width:100%;border:1px solid var(--frost);border-radius:14px;padding:20px;background:var(--card);color:var(--ink);box-shadow:0 20px 60px #0004}dialog::backdrop{background:#16202b88}.form-row{margin:12px 0}.form-row label{display:block;font-size:12px;color:var(--slate);margin-bottom:4px}.form-row input{width:100%;padding:10px;border:1px solid var(--frost);border-radius:8px;background:var(--paper);color:var(--ink);font:14px var(--sans)}
+@media(min-width:760px){body{font-size:16px}.panel{padding-top:28px}.cities-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}.city{margin-bottom:0}.leg{display:none}.mapwrap{max-width:820px;margin:auto}nav{left:50%;right:auto;transform:translateX(-50%);width:min(620px,100%);border:1px solid var(--frost);border-bottom:0;border-radius:14px 14px 0 0}.tip{max-width:820px}}
+</style>
+</head>
+<body>
+<div class="app">
+
+<header>
+  <div class="brand">
+    <h1>서유럽 13박</h1>
+    <div class="count" id="count">2027.02.03 → 02.17</div>
+  </div>
+</header>
+
+<!-- ─────────── 일정 ─────────── -->
+<section class="panel on" id="p-plan">
+  <p class="eyebrow">Itinerary</p>
+  <h2>날짜별 일정</h2>
+  <div id="cities" class="cities-grid"></div>
+  <p class="tip">도시 카드를 누르면 펼쳐집니다. 파리는 2월 8일 월요일에 오르세와 베르사유가 쉬므로 순서를 바꾸지 마세요.</p>
+</section>
+
+<!-- ─────────── 지도 ─────────── -->
+<section class="panel" id="p-map">
+  <p class="eyebrow">Route</p>
+  <h2>전체 동선</h2>
+  <div class="mapwrap map">
+    <svg viewBox="0 100 680 430" role="img" xmlns="http://www.w3.org/2000/svg">
+      <title>서유럽 5개 도시 경로</title>
+      <defs><marker id="a" viewBox="0 0 10 10" refX="8" refY="5" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+        <path d="M2 1L8 5L2 9" fill="none" stroke="context-stroke" stroke-width="1.5" stroke-linecap="round"/></marker></defs>
+      <g fill="var(--soft)" stroke="var(--frost)" stroke-width="1">
+        <path d="M93 197L157 163L233 125L285 138L363 191L360 221L328 258L352 328L310 339L258 357L159 334L166 303L167 260L144 230Z"/>
+        <path d="M159 334L258 357L240 393L184 447L150 470L60 470L60 334Z"/>
+        <path d="M328 258L360 221L380 226L399 225L412 247L390 264L348 262Z"/>
+        <path d="M362 290L394 278L462 281L495 274L489 331L563 401L596 429L555 434L535 488L518 418L506 408L450 373L419 334L388 309Z"/>
+        <path d="M370 393L407 388L404 461L374 455Z"/>
+      </g>
+      <g stroke="var(--alpine)" stroke-width="4" stroke-linecap="round" marker-end="url(#a)">
+        <line x1="240" y1="380" x2="244" y2="200"/><line x1="256" y1="190" x2="352" y2="238"/>
+        <line x1="374" y1="256" x2="431" y2="315"/><line x1="447" y1="338" x2="461" y2="366"/>
+      </g>
+      <g fill="var(--card)" stroke="var(--alpine)" stroke-width="2">
+        <circle cx="240" cy="393" r="13"/><circle cx="244" cy="184" r="13"/><circle cx="365" cy="245" r="13"/>
+        <circle cx="440" cy="326" r="13"/><circle cx="467" cy="379" r="13"/></g>
+      <g font-family="IBM Plex Mono,monospace" font-size="13" font-weight="500" fill="var(--ink)" text-anchor="middle" dominant-baseline="central">
+        <text x="240" y="393">1</text><text x="244" y="184">2</text><text x="365" y="245">3</text>
+        <text x="440" y="326">4</text><text x="467" y="379">5</text></g>
+      <g font-family="IBM Plex Sans KR,sans-serif" font-size="15" font-weight="500" fill="var(--ink)">
+        <text x="240" y="428" text-anchor="middle">바르셀로나</text><text x="266" y="176">파리</text>
+        <text x="386" y="238">인터라켄</text><text x="461" y="318">피렌체</text><text x="489" y="374">로마</text></g>
+      <g font-family="IBM Plex Mono,monospace" font-size="12" fill="var(--slate)">
+        <text x="222" y="296" text-anchor="end">6h30</text><text x="300" y="238" text-anchor="middle">5h30</text>
+        <text x="352" y="302" text-anchor="end">7h</text><text x="489" y="352">1h30</text></g>
+    </svg>
+    <div class="legend">도시 간 이동은 전 구간 기차</div>
+  </div>
+  <p class="tip">경로선은 도시를 잇는 개념선이며 실제 노선과 다릅니다. 인천 출발 2/3, 인천 도착 2/17.</p>
+</section>
+
+<!-- ─────────── 항공 ─────────── -->
+<section class="panel" id="p-fly">
+  <p class="eyebrow">Flights</p>
+  <h2>항공편과 좌석</h2>
+  <div class="fcard">
+    <div class="frow"><span>구간</span><span>인천 → 바르셀로나</span></div>
+    <div class="frow"><span>날짜</span><span>2/3 수</span></div>
+    <div class="frow"><span>좌석</span><span>프리미엄 이코노미 · 2-4-2</span></div>
+    <div class="seats"><i class="seat">7G</i><i class="seat">7H</i><i class="seat">8G</i><i class="seat">8H</i></div>
+  </div>
+  <div class="fcard">
+    <div class="frow"><span>구간</span><span>로마 → 인천</span></div>
+    <div class="frow"><span>날짜</span><span>2/16 화 저녁</span></div>
+    <div class="frow"><span>좌석</span><span>이코노미 · 3-4-3</span></div>
+    <div class="seats"><i class="seat">39H</i><i class="seat">39K</i><i class="seat">40J</i><i class="seat">40K</i></div>
+  </div>
+  <div class="note"><b>좌석</b><span>7열과 39열은 앞이 벽인 맨 앞열입니다. 발밑 수납이 없어 이착륙 때 짐을 머리 위 선반에 넣어야 하고, 팔걸이가 고정입니다. 앞쪽에 유아 요람 거치 위치가 있습니다.</span></div>
+  <p class="tip">두 구간의 편명과 항공사가 이미지에 없어 비워뒀습니다. 알려주시면 채워 넣겠습니다.</p>
+</section>
+
+<!-- ─────────── 준비 ─────────── -->
+<section class="panel" id="p-todo">
+  <p class="eyebrow">Before you go</p>
+  <h2>예약 체크리스트</h2>
+  <div id="todos"></div>
+  <p class="tip">체크 상태는 이 기기에 저장됩니다. 위에서부터 순서대로 처리하세요.</p>
+</section>
+
+<!-- ─────────── 사진 · 링크 ─────────── -->
+<section class="panel" id="p-share">
+  <p class="eyebrow">Shared notebook</p>
+  <h2>나의 사진 · 링크</h2>
+  <div class="share-card">
+    <h3>여행 정보를 함께 채우세요</h3>
+    <p>사진 주소와 링크를 추가하면 이 기기에 자동 저장됩니다. “공유 링크 만들기”는 현재 내용을 주소에 담아 다른 사람도 같은 내용을 열 수 있게 합니다.</p>
+    <div class="tool-row">
+      <button class="primary" id="add-photo">사진 추가</button><button class="primary" id="add-link">링크 추가</button>
+      <button id="copy-share">공유 링크 만들기</button><button id="export-data">백업 내보내기</button>
+      <label>백업 불러오기<input id="import-data" type="file" accept="application/json" hidden></label>
+    </div>
+  </div>
+  <h2 class="sub">사진</h2><div id="photos" class="collection"></div>
+  <h2 class="sub">내 링크</h2><div id="custom-links"></div>
+  <p class="tip">사진은 공개 이미지 URL을 넣어야 공유한 사람도 볼 수 있습니다. 내 컴퓨터의 사진 파일은 먼저 Google Photos, iCloud 공유 앨범, Imgur 등에서 공개 링크를 만든 뒤 사용하세요.</p>
+</section>
+
+</div>
+
+<nav>
+  <button class="on" data-t="plan"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>일정</button>
+  <button data-t="map"><svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>지도</button>
+  <button data-t="fly"><svg viewBox="0 0 24 24"><path d="M17.8 19.8 16 14l-4 4v3l-2-2-2 2v-3l-4-4-1.8 5.8"/><path d="M12 2c1.3 0 2 1.5 2 3v5l7 4v2l-7-2-2 2-2-2-7 2v-2l7-4V5c0-1.5.7-3 2-3Z"/></svg>항공</button>
+  <button data-t="todo"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>준비</button>
+  <button data-t="share"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>사진·링크</button>
+</nav>
+
+<dialog id="photo-dialog"><form method="dialog"><h2>사진 추가</h2><div class="form-row"><label for="photo-title">제목</label><input id="photo-title" placeholder="예: 사그라다 파밀리아 예약 화면"></div><div class="form-row"><label for="photo-url">공개 이미지 URL</label><input id="photo-url" type="url" required placeholder="https://..."></div><div class="form-row"><label for="photo-link">눌렀을 때 열 링크 (선택)</label><input id="photo-link" type="url" placeholder="https://..."></div><div class="tool-row"><button class="primary" value="save">저장</button><button value="cancel">취소</button></div></form></dialog>
+<dialog id="link-dialog"><form method="dialog"><h2>링크 추가</h2><div class="form-row"><label for="link-title">이름</label><input id="link-title" required placeholder="예: 숙소 예약"></div><div class="form-row"><label for="link-url">URL</label><input id="link-url" type="url" required placeholder="https://..."></div><div class="tool-row"><button class="primary" value="save">저장</button><button value="cancel">취소</button></div></form></dialog>
+
+<script>
+// ── 사진 · 링크: 자동저장 + 공유용 주소 ──
+const CUSTOM_KEY = 'west-europe-2027-custom-v1';
+const encodeShare = value => btoa(unescape(encodeURIComponent(JSON.stringify(value))));
+const decodeShare = value => JSON.parse(decodeURIComponent(escape(atob(value))));
+let custom = {photos:[], links:[]};
+try {
+  const shared = new URLSearchParams(location.hash.slice(1)).get('trip');
+  custom = shared ? decodeShare(shared) : JSON.parse(localStorage.getItem(CUSTOM_KEY) || '{}');
+  custom.photos ||= []; custom.links ||= [];
+} catch(e) { custom = {photos:[], links:[]}; }
+function saveCustom(){ try { localStorage.setItem(CUSTOM_KEY, JSON.stringify(custom)); } catch(e){} }
+function esc(value){ const el=document.createElement('span'); el.textContent=value||''; return el.innerHTML; }
+function safeUrl(value){ try { const u=new URL(value); return /^https?:$/.test(u.protocol) ? u.href : '#'; } catch(e) { return '#'; } }
+function renderCustom(){
+  document.getElementById('photos').innerHTML = custom.photos.length ? custom.photos.map((p,i)=>`<article class="photo"><img src="${safeUrl(p.url)}" alt="${esc(p.title)}" loading="lazy"><div class="photo-copy"><b>${esc(p.title||'여행 사진')}</b>${p.link?`<a href="${safeUrl(p.link)}" target="_blank" rel="noopener">관련 링크 열기 ↗</a>`:''}</div><button class="delete" data-photo="${i}" aria-label="사진 삭제">×</button></article>`).join('') : '<p class="tip">아직 사진이 없습니다. “사진 추가”로 여행 사진이나 예약 화면을 넣어보세요.</p>';
+  document.getElementById('custom-links').innerHTML = custom.links.length ? custom.links.map((l,i)=>`<div class="custom-link"><a href="${safeUrl(l.url)}" target="_blank" rel="noopener">${esc(l.title)} <small>↗</small></a><button data-link="${i}" aria-label="링크 삭제">×</button></div>`).join('') : '<p class="tip">아직 추가한 링크가 없습니다.</p>';
+  document.querySelectorAll('[data-photo]').forEach(b=>b.onclick=()=>{custom.photos.splice(+b.dataset.photo,1);saveCustom();renderCustom()});
+  document.querySelectorAll('[data-link]').forEach(b=>b.onclick=()=>{custom.links.splice(+b.dataset.link,1);saveCustom();renderCustom()});
+}
+const photoDialog=document.getElementById('photo-dialog'), linkDialog=document.getElementById('link-dialog');
+document.getElementById('add-photo').onclick=()=>photoDialog.showModal();
+document.getElementById('add-link').onclick=()=>linkDialog.showModal();
+photoDialog.addEventListener('close',()=>{if(photoDialog.returnValue==='save'){custom.photos.push({title:document.getElementById('photo-title').value.trim(),url:document.getElementById('photo-url').value.trim(),link:document.getElementById('photo-link').value.trim()});saveCustom();renderCustom();photoDialog.querySelector('form').reset()}});
+linkDialog.addEventListener('close',()=>{if(linkDialog.returnValue==='save'){custom.links.push({title:document.getElementById('link-title').value.trim(),url:document.getElementById('link-url').value.trim()});saveCustom();renderCustom();linkDialog.querySelector('form').reset()}});
+document.getElementById('copy-share').onclick=async()=>{const url=`${location.href.split('#')[0]}#trip=${encodeShare(custom)}`;try{await navigator.clipboard.writeText(url);alert('현재 사진과 링크를 담은 공유 주소를 복사했습니다.');}catch(e){prompt('아래 주소를 복사해 공유하세요.',url)}};
+document.getElementById('export-data').onclick=()=>{const blob=new Blob([JSON.stringify(custom,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='west-europe-2027-backup.json';a.click();URL.revokeObjectURL(a.href)};
+document.getElementById('import-data').onchange=e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const loaded=JSON.parse(reader.result);if(!Array.isArray(loaded.photos)||!Array.isArray(loaded.links))throw Error();custom=loaded;saveCustom();renderCustom();alert('백업을 불러왔습니다.')}catch(err){alert('올바른 백업 파일이 아닙니다.')}};reader.readAsText(file);e.target.value=''};
+renderCustom();
+
+const CITIES = [
+ {n:1,name:'바르셀로나',meta:'3박 · 2/3–2/6 · 9~15°C',
+  days:[['2/3 수','인천 출발, 저녁 도착. 호텔 체크인 후 휴식',0],
+        ['2/4 목','사그라다 파밀리아 · 카사 바트요 · 고딕지구 · 보케리아 시장',0],
+        ['2/5 금','팔라우 데 라 무지카 가이드투어 · 산 파우 병원 · 오후 구엘 공원 또는 몬주익 야경',0],
+        ['2/6 토','오전 산츠역 출발, 직행 TGV',1]],
+  note:['예약','팔라우 데 라 무지카는 가이드투어로만 입장하며 사전 예약이 필요합니다. 2월 5일 오후는 한 곳만 고르세요.'],
+  eat:'판 콘 토마테, 이베리코 하몽, 아로스 네그레, 크레마 카탈라나, 츄로스 콘 초콜라테, 카바',
+  links:[['사그라다 파밀리아','https://sagradafamilia.org'],['구엘 공원','https://parkguell.barcelona'],
+         ['카사 바트요','https://www.casabatllo.es'],['팔라우 데 라 무지카','https://www.palaumusica.cat'],
+         ['산 파우 병원','https://www.santpaubarcelona.org']],
+  leg:'기차 6시간 30분 · 직행 TGV'},
+ {n:2,name:'파리',meta:'3박 · 2/6–2/9 · 3~8°C',
+  days:[['2/6 토','오후 도착. 에펠탑 · 센강 유람선 · 개선문',0],
+        ['2/7 일','베르사유 반나절 · 오후 오르세 미술관',0],
+        ['2/8 월','루브르 오전 · 오후 몽마르트르, 사크레쾨르',0],
+        ['2/9 화','오전 리옹역 출발, 바젤 환승',1]],
+  note:['휴관','2월 8일 월요일은 오르세와 베르사유가 쉽니다. 위 순서가 유일한 답입니다. 2월 7일은 첫 일요일이라 무료 개방일일 수 있어 혼잡할 수 있습니다.'],
+  eat:'겨울 제철 굴, 뵈프 부르기뇽, 어니언 수프, 스테이크 프리트, 크루아상, 마카롱',
+  links:[['루브르','https://www.louvre.fr'],['오르세','https://www.musee-orsay.fr'],
+         ['베르사유','https://www.chateauversailles.fr'],['에펠탑','https://www.toureiffel.paris'],
+         ['SNCF','https://www.sncf-connect.com']],
+  leg:'기차 5시간 30분 · 바젤 환승'},
+ {n:3,name:'인터라켄',meta:'3박 · 2/9–2/12 · -2~5°C',
+  days:[['2/9 화','오후 도착. 마을 산책, 툰 호숫가',0],
+        ['2/10 수','융프라우요흐 종일 · 아이거 익스프레스 편도 1시간 30분',0],
+        ['2/11 목','예비일 · 그린델발트 피르스트 또는 라우터브루넨 계곡',0],
+        ['2/12 금','밀라노 경유 피렌체행, 종일 이동',1]],
+  note:['여유','온전한 이틀을 확보했으니 예보를 보고 맑은 날에 융프라우를 배치하세요. 하더쿨름과 쉬니게플라테는 겨울 운휴입니다.'],
+  eat:'치즈 퐁뒤, 라클렛, 뢰스티, 비르허뮈슬리. 융프라우요흐 정상의 신라면',
+  links:[['융프라우','https://www.jungfrau.ch'],['쉴트호른','https://schilthorn.ch'],
+         ['인터라켄 관광청','https://www.interlaken.ch'],['SBB','https://www.sbb.ch']],
+  leg:'기차 7시간 · 밀라노 환승'},
+ {n:4,name:'피렌체',meta:'2박 · 2/12–2/14 · 3~12°C',
+  days:[['2/12 금','저녁 도착. 두오모 야경, 베키오 다리 산책',0],
+        ['2/13 토','아카데미아 오전 · 두오모 · 우피치 오후 · 미켈란젤로 광장 일몰',0],
+        ['2/14 일','오전 중앙시장·가죽시장, 오후 로마행',1]],
+  note:['여유','2월 13일 토요일이라 우피치·아카데미아(월요일 휴관)와 두오모(일요일 입장 불가)가 모두 열립니다.'],
+  eat:'비스테카 알라 피오렌티나, 람프레도토, 리볼리타, 트러플 파니니, 키안티',
+  links:[['우피치','https://www.uffizi.it'],['아카데미아','https://www.galleriaaccademiafirenze.it'],
+         ['두오모','https://duomo.firenze.it'],['트렌이탈리아','https://www.trenitalia.com']],
+  leg:'기차 1시간 30분 · 고속열차 직통'},
+ {n:5,name:'로마',meta:'2박 · 2/14–2/16 · 4~13°C',
+  days:[['2/14 일','저녁 도착. 트레비 분수 · 판테온 야경 도보',0],
+        ['2/15 월','바티칸 박물관 · 시스티나 성당 · 성 베드로 대성당',0],
+        ['2/16 화','콜로세움 · 포로 로마노 · 스페인 광장 · 산탄젤로 성',0],
+        ['2/16 화 저녁','피우미치노 공항 출발, 2/17 인천 도착',1]],
+  note:['여유','바티칸 박물관은 일요일 휴관이라 월요일에, 산탄젤로 성은 월요일 휴관이라 화요일에 배치했습니다.'],
+  eat:'카르보나라, 카초 에 페페, 수플리, 로마식 아티초크(2월 제철), 마리토쪼, 젤라토',
+  links:[['바티칸 박물관','https://www.museivaticani.va'],['성 베드로 대성당','https://www.vatican.va'],
+         ['콜로세움','https://parcocolosseo.it'],['산탄젤로 성','https://castelsantangelo.beniculturali.it']],
+  leg:''}
+];
+
+const TODOS = [
+ ['바르셀로나 → 파리 직행 TGV','2/6 토','하루 몇 편뿐이라 좌석이 일찍 찹니다. 가장 먼저 잡으세요.'],
+ ['바티칸 박물관','2/15 월','일요일 휴관이라 이 날짜로 고정. 시간 지정 예약 필요.'],
+ ['우피치 · 아카데미아 · 두오모','2/13 토','오전 아카데미아, 오후 우피치. 두오모 통합권도 같은 날.'],
+ ['파리 미술관','2/7 일 · 2/8 월','일요일 베르사유·오르세, 월요일 루브르. 첫 일요일 혼잡 주의.'],
+ ['사그라다 파밀리아','2/4 목','시간 지정 입장. 탑 등반은 별도 요금.'],
+ ['팔라우 데 라 무지카','2/5 금','가이드투어로만 입장. 오전 투어 권장.'],
+ ['융프라우요흐','2/10 수 또는 2/11 목','예보 좋은 날 선택. 당일 아침 정상 날씨 확인 후 구매.']
+];
+
+// ── 도시 카드 ──
+const today = new Date();
+const cur = `${today.getMonth()+1}/${today.getDate()}`;
+document.getElementById('cities').innerHTML = CITIES.map((c,i)=>`
+<div class="city${i===0?' open':''}">
+  <div class="chead">
+    <span class="cnum">0${c.n}</span><span class="cname">${c.name}</span>
+    <span class="cmeta">${c.meta}</span><span class="caret">▸</span>
+  </div>
+  <div class="cbody">
+    ${c.days.map(d=>`<div class="day${d[2]?' move':''}${d[0].startsWith(cur+' ')?' now':''}">
+      <span class="dd">${d[0]}</span><span class="da">${d[1]}</span></div>`).join('')}
+    <div class="note"><b>${c.note[0]}</b><span>${c.note[1]}</span></div>
+    <p class="eat"><span>필수</span>${c.eat}</p>
+    <p class="links">${c.links.map(l=>`<a href="${l[1]}" target="_blank" rel="noopener">${l[0]}</a>`).join('')}</p>
+  </div>
+</div>
+${c.leg?`<div class="leg"><i></i>${c.leg}</div>`:''}`).join('');
+
+document.querySelectorAll('.chead').forEach(h=>
+  h.addEventListener('click',()=>h.parentElement.classList.toggle('open')));
+
+// ── 체크리스트 ──
+let saved = {};
+try{ saved = JSON.parse(localStorage.getItem('trip27')||'{}'); }catch(e){}
+document.getElementById('todos').innerHTML = TODOS.map((t,i)=>`
+<div class="chk${saved[i]?' done':''}" data-i="${i}">
+  <span class="box">✓</span>
+  <span class="ctext"><b>${t[0]}</b><span class="cwhen">${t[1]}</span>${t[2]}</span>
+</div>`).join('');
+
+document.querySelectorAll('.chk').forEach(el=>el.addEventListener('click',()=>{
+  el.classList.toggle('done');
+  saved[el.dataset.i] = el.classList.contains('done');
+  try{ localStorage.setItem('trip27',JSON.stringify(saved)); }catch(e){}
+}));
+
+// ── 탭 ──
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>{
+  document.querySelectorAll('nav button').forEach(x=>x.classList.remove('on'));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.remove('on'));
+  b.classList.add('on');
+  document.getElementById('p-'+b.dataset.t).classList.add('on');
+  window.scrollTo({top:0});
+}));
+
+// ── D-day ──
+const dep = new Date(2027,1,3);
+const diff = Math.ceil((dep - today)/86400000);
+document.getElementById('count').innerHTML =
+  (diff>0 ? `출발까지 D-${diff}<br>` : diff===0 ? `오늘 출발<br>` : `여행 중<br>`) + '2027.02.03 → 02.17';
+</script>
+</body>
+</html>
