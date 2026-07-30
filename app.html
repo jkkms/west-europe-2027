@@ -111,11 +111,8 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;
 .map svg{width:100%;height:auto;display:block}
 .mapwrap{background:var(--card);border:1px solid var(--frost);border-radius:12px;padding:14px 8px 8px}
 .legend{font-family:var(--mono);font-size:11px;color:var(--slate);text-align:center;padding:8px 0 2px}
-.share-card{background:var(--card);border:1px solid var(--frost);border-radius:12px;padding:16px;margin-bottom:12px}
-.share-card h3{font-family:var(--serif);font-size:17px;margin:0 0 4px}.share-card p{font-size:13px;color:var(--slate);margin:0 0 12px}
-.tool-row{display:flex;flex-wrap:wrap;gap:8px}.tool-row button,.tool-row label{border:1px solid var(--frost);background:var(--paper);color:var(--ink);border-radius:8px;padding:8px 11px;font:500 12px var(--sans);cursor:pointer}.tool-row .primary{background:var(--alpine);border-color:var(--alpine);color:#fff}
-.collection{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:12px}.photo{position:relative;border:1px solid var(--frost);border-radius:12px;overflow:hidden;background:var(--card)}.photo img{display:block;width:100%;height:170px;object-fit:cover;background:var(--soft)}.photo-copy{padding:10px 12px}.photo-copy b{display:block;font-size:14px}.photo-copy a{display:block;color:var(--deep);font-size:12px;text-decoration:none;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.delete{position:absolute;top:8px;right:8px;width:28px;height:28px;border:0;border-radius:50%;background:#16202bd9;color:#fff;font-size:18px;cursor:pointer}
-.custom-link{display:flex;align-items:center;justify-content:space-between;gap:10px;border:1px solid var(--frost);border-radius:9px;padding:11px 12px;margin:8px 0;background:var(--card)}.custom-link a{color:var(--deep);text-decoration:none;font-size:14px}.custom-link button{border:0;background:none;color:var(--ember);font-size:18px;cursor:pointer}
+.materials{margin-top:12px;padding-top:11px;border-top:1px solid var(--frost)}.materials-head{display:flex;justify-content:space-between;align-items:center;gap:8px;font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--slate)}.materials-head button{border:1px solid var(--frost);background:var(--paper);color:var(--deep);border-radius:99px;padding:4px 9px;font:500 11px var(--sans);cursor:pointer}.asset-list{display:grid;gap:7px;margin-top:8px}.asset{display:flex;align-items:center;gap:9px;border:1px solid var(--frost);border-radius:8px;padding:7px;background:var(--paper)}.asset img{width:42px;height:42px;border-radius:5px;object-fit:cover;background:var(--soft)}.asset a{flex:1;color:var(--deep);text-decoration:none;font-size:12.5px;line-height:1.35}.asset button{border:0;background:none;color:var(--ember);font-size:17px;cursor:pointer}
+.tool-row{display:flex;flex-wrap:wrap;gap:8px}.tool-row button{border:1px solid var(--frost);background:var(--paper);color:var(--ink);border-radius:8px;padding:8px 11px;font:500 12px var(--sans);cursor:pointer}.tool-row .primary{background:var(--alpine);border-color:var(--alpine);color:#fff}
 dialog{max-width:min(92vw,520px);width:100%;border:1px solid var(--frost);border-radius:14px;padding:20px;background:var(--card);color:var(--ink);box-shadow:0 20px 60px #0004}dialog::backdrop{background:#16202b88}.form-row{margin:12px 0}.form-row label{display:block;font-size:12px;color:var(--slate);margin-bottom:4px}.form-row input{width:100%;padding:10px;border:1px solid var(--frost);border-radius:8px;background:var(--paper);color:var(--ink);font:14px var(--sans)}
 @media(min-width:760px){body{font-size:16px}.panel{padding-top:28px}.cities-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;align-items:start}.city{margin-bottom:0}.leg{display:none}.mapwrap{max-width:820px;margin:auto}nav{left:50%;right:auto;transform:translateX(-50%);width:min(620px,100%);border:1px solid var(--frost);border-bottom:0;border-radius:14px 14px 0 0}.tip{max-width:820px}}
 </style>
@@ -185,12 +182,14 @@ dialog{max-width:min(92vw,520px);width:100%;border:1px solid var(--frost);border
     <div class="frow"><span>날짜</span><span>2/3 수</span></div>
     <div class="frow"><span>좌석</span><span>프리미엄 이코노미 · 2-4-2</span></div>
     <div class="seats"><i class="seat">7G</i><i class="seat">7H</i><i class="seat">8G</i><i class="seat">8H</i></div>
+    <div class="materials" data-entity="flight-out"></div>
   </div>
   <div class="fcard">
     <div class="frow"><span>구간</span><span>로마 → 인천</span></div>
     <div class="frow"><span>날짜</span><span>2/16 화 저녁</span></div>
     <div class="frow"><span>좌석</span><span>이코노미 · 3-4-3</span></div>
     <div class="seats"><i class="seat">39H</i><i class="seat">39K</i><i class="seat">40J</i><i class="seat">40K</i></div>
+    <div class="materials" data-entity="flight-back"></div>
   </div>
   <div class="note"><b>좌석</b><span>7열과 39열은 앞이 벽인 맨 앞열입니다. 발밑 수납이 없어 이착륙 때 짐을 머리 위 선반에 넣어야 하고, 팔걸이가 고정입니다. 앞쪽에 유아 요람 거치 위치가 있습니다.</span></div>
   <p class="tip">두 구간의 편명과 항공사가 이미지에 없어 비워뒀습니다. 알려주시면 채워 넣겠습니다.</p>
@@ -201,25 +200,7 @@ dialog{max-width:min(92vw,520px);width:100%;border:1px solid var(--frost);border
   <p class="eyebrow">Before you go</p>
   <h2>예약 체크리스트</h2>
   <div id="todos"></div>
-  <p class="tip">체크 상태는 이 기기에 저장됩니다. 위에서부터 순서대로 처리하세요.</p>
-</section>
-
-<!-- ─────────── 사진 · 링크 ─────────── -->
-<section class="panel" id="p-share">
-  <p class="eyebrow">Shared notebook</p>
-  <h2>나의 사진 · 링크</h2>
-  <div class="share-card">
-    <h3>여행 정보를 함께 채우세요</h3>
-    <p>사진 주소와 링크를 추가하면 이 기기에 자동 저장됩니다. “공유 링크 만들기”는 현재 내용을 주소에 담아 다른 사람도 같은 내용을 열 수 있게 합니다.</p>
-    <div class="tool-row">
-      <button class="primary" id="add-photo">사진 추가</button><button class="primary" id="add-link">링크 추가</button>
-      <button id="copy-share">공유 링크 만들기</button><button id="export-data">백업 내보내기</button>
-      <label>백업 불러오기<input id="import-data" type="file" accept="application/json" hidden></label>
-    </div>
-  </div>
-  <h2 class="sub">사진</h2><div id="photos" class="collection"></div>
-  <h2 class="sub">내 링크</h2><div id="custom-links"></div>
-  <p class="tip">사진은 공개 이미지 URL을 넣어야 공유한 사람도 볼 수 있습니다. 내 컴퓨터의 사진 파일은 먼저 Google Photos, iCloud 공유 앨범, Imgur 등에서 공개 링크를 만든 뒤 사용하세요.</p>
+  <p class="tip">현재 체크 상태는 각 기기에 저장됩니다. 모든 사람이 같은 상태를 보려면 공동 저장소 연결이 필요합니다.</p>
 </section>
 
 </div>
@@ -229,41 +210,29 @@ dialog{max-width:min(92vw,520px);width:100%;border:1px solid var(--frost);border
   <button data-t="map"><svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>지도</button>
   <button data-t="fly"><svg viewBox="0 0 24 24"><path d="M17.8 19.8 16 14l-4 4v3l-2-2-2 2v-3l-4-4-1.8 5.8"/><path d="M12 2c1.3 0 2 1.5 2 3v5l7 4v2l-7-2-2 2-2-2-7 2v-2l7-4V5c0-1.5.7-3 2-3Z"/></svg>항공</button>
   <button data-t="todo"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>준비</button>
-  <button data-t="share"><svg viewBox="0 0 24 24"><path d="M12 3v12"/><path d="m7 8 5-5 5 5"/><path d="M5 14v5a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2v-5"/></svg>사진·링크</button>
 </nav>
 
-<dialog id="photo-dialog"><form method="dialog"><h2>사진 추가</h2><div class="form-row"><label for="photo-title">제목</label><input id="photo-title" placeholder="예: 사그라다 파밀리아 예약 화면"></div><div class="form-row"><label for="photo-url">공개 이미지 URL</label><input id="photo-url" type="url" required placeholder="https://..."></div><div class="form-row"><label for="photo-link">눌렀을 때 열 링크 (선택)</label><input id="photo-link" type="url" placeholder="https://..."></div><div class="tool-row"><button class="primary" value="save">저장</button><button value="cancel">취소</button></div></form></dialog>
-<dialog id="link-dialog"><form method="dialog"><h2>링크 추가</h2><div class="form-row"><label for="link-title">이름</label><input id="link-title" required placeholder="예: 숙소 예약"></div><div class="form-row"><label for="link-url">URL</label><input id="link-url" type="url" required placeholder="https://..."></div><div class="tool-row"><button class="primary" value="save">저장</button><button value="cancel">취소</button></div></form></dialog>
+<dialog id="asset-dialog"><form method="dialog"><h2 id="asset-dialog-title">자료 추가</h2><div class="form-row"><label for="asset-title">이름</label><input id="asset-title" required placeholder="예: 예약 확인서"></div><div class="form-row"><label for="asset-url">링크 또는 이미지 URL</label><input id="asset-url" type="url" required placeholder="https://..."></div><div class="form-row"><label for="asset-type">표시 방식</label><select id="asset-type"><option value="link">링크</option><option value="image">사진</option></select></div><div class="tool-row"><button class="primary" value="save">저장</button><button value="cancel">취소</button></div></form></dialog>
 
 <script>
-// ── 사진 · 링크: 자동저장 + 공유용 주소 ──
-const CUSTOM_KEY = 'west-europe-2027-custom-v1';
-const encodeShare = value => btoa(unescape(encodeURIComponent(JSON.stringify(value))));
-const decodeShare = value => JSON.parse(decodeURIComponent(escape(atob(value))));
-let custom = {photos:[], links:[]};
-try {
-  const shared = new URLSearchParams(location.hash.slice(1)).get('trip');
-  custom = shared ? decodeShare(shared) : JSON.parse(localStorage.getItem(CUSTOM_KEY) || '{}');
-  custom.photos ||= []; custom.links ||= [];
-} catch(e) { custom = {photos:[], links:[]}; }
-function saveCustom(){ try { localStorage.setItem(CUSTOM_KEY, JSON.stringify(custom)); } catch(e){} }
+// ── 장소·항공편별 개인 자료 ──
+const ASSET_KEY = 'west-europe-2027-assets-v2';
+let assets = {};
+try { assets = JSON.parse(localStorage.getItem(ASSET_KEY) || '{}'); } catch(e) {}
 function esc(value){ const el=document.createElement('span'); el.textContent=value||''; return el.innerHTML; }
 function safeUrl(value){ try { const u=new URL(value); return /^https?:$/.test(u.protocol) ? u.href : '#'; } catch(e) { return '#'; } }
-function renderCustom(){
-  document.getElementById('photos').innerHTML = custom.photos.length ? custom.photos.map((p,i)=>`<article class="photo"><img src="${safeUrl(p.url)}" alt="${esc(p.title)}" loading="lazy"><div class="photo-copy"><b>${esc(p.title||'여행 사진')}</b>${p.link?`<a href="${safeUrl(p.link)}" target="_blank" rel="noopener">관련 링크 열기 ↗</a>`:''}</div><button class="delete" data-photo="${i}" aria-label="사진 삭제">×</button></article>`).join('') : '<p class="tip">아직 사진이 없습니다. “사진 추가”로 여행 사진이나 예약 화면을 넣어보세요.</p>';
-  document.getElementById('custom-links').innerHTML = custom.links.length ? custom.links.map((l,i)=>`<div class="custom-link"><a href="${safeUrl(l.url)}" target="_blank" rel="noopener">${esc(l.title)} <small>↗</small></a><button data-link="${i}" aria-label="링크 삭제">×</button></div>`).join('') : '<p class="tip">아직 추가한 링크가 없습니다.</p>';
-  document.querySelectorAll('[data-photo]').forEach(b=>b.onclick=()=>{custom.photos.splice(+b.dataset.photo,1);saveCustom();renderCustom()});
-  document.querySelectorAll('[data-link]').forEach(b=>b.onclick=()=>{custom.links.splice(+b.dataset.link,1);saveCustom();renderCustom()});
+function saveAssets(){ try { localStorage.setItem(ASSET_KEY,JSON.stringify(assets)); } catch(e){} }
+function renderAssets(){
+  document.querySelectorAll('.materials').forEach(box=>{
+    const entity=box.dataset.entity, items=assets[entity]||[];
+    box.innerHTML=`<div class="materials-head"><span>나의 자료</span><button data-add-asset="${entity}">+ 링크·사진</button></div><div class="asset-list">${items.map((item,i)=>`<div class="asset">${item.type==='image'?`<img src="${safeUrl(item.url)}" alt="">`:''}<a href="${safeUrl(item.url)}" target="_blank" rel="noopener">${esc(item.title)} ${item.type==='image'?'사진 보기 ↗':'↗'}</a><button data-remove-asset="${entity}:${i}" aria-label="삭제">×</button></div>`).join('')}</div>`;
+  });
+  document.querySelectorAll('[data-add-asset]').forEach(b=>b.onclick=()=>openAssetDialog(b.dataset.addAsset));
+  document.querySelectorAll('[data-remove-asset]').forEach(b=>b.onclick=()=>{const [entity,index]=b.dataset.removeAsset.split(':');assets[entity].splice(+index,1);saveAssets();renderAssets()});
 }
-const photoDialog=document.getElementById('photo-dialog'), linkDialog=document.getElementById('link-dialog');
-document.getElementById('add-photo').onclick=()=>photoDialog.showModal();
-document.getElementById('add-link').onclick=()=>linkDialog.showModal();
-photoDialog.addEventListener('close',()=>{if(photoDialog.returnValue==='save'){custom.photos.push({title:document.getElementById('photo-title').value.trim(),url:document.getElementById('photo-url').value.trim(),link:document.getElementById('photo-link').value.trim()});saveCustom();renderCustom();photoDialog.querySelector('form').reset()}});
-linkDialog.addEventListener('close',()=>{if(linkDialog.returnValue==='save'){custom.links.push({title:document.getElementById('link-title').value.trim(),url:document.getElementById('link-url').value.trim()});saveCustom();renderCustom();linkDialog.querySelector('form').reset()}});
-document.getElementById('copy-share').onclick=async()=>{const url=`${location.href.split('#')[0]}#trip=${encodeShare(custom)}`;try{await navigator.clipboard.writeText(url);alert('현재 사진과 링크를 담은 공유 주소를 복사했습니다.');}catch(e){prompt('아래 주소를 복사해 공유하세요.',url)}};
-document.getElementById('export-data').onclick=()=>{const blob=new Blob([JSON.stringify(custom,null,2)],{type:'application/json'}),a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download='west-europe-2027-backup.json';a.click();URL.revokeObjectURL(a.href)};
-document.getElementById('import-data').onchange=e=>{const file=e.target.files[0];if(!file)return;const reader=new FileReader();reader.onload=()=>{try{const loaded=JSON.parse(reader.result);if(!Array.isArray(loaded.photos)||!Array.isArray(loaded.links))throw Error();custom=loaded;saveCustom();renderCustom();alert('백업을 불러왔습니다.')}catch(err){alert('올바른 백업 파일이 아닙니다.')}};reader.readAsText(file);e.target.value=''};
-renderCustom();
+const assetDialog=document.getElementById('asset-dialog'); let activeEntity='';
+function openAssetDialog(entity){activeEntity=entity;document.getElementById('asset-dialog-title').textContent=entity.startsWith('city-')?'이 도시에 자료 추가':'이 항공편에 자료 추가';assetDialog.showModal()}
+assetDialog.addEventListener('close',()=>{if(assetDialog.returnValue==='save'){const title=document.getElementById('asset-title').value.trim(),url=document.getElementById('asset-url').value.trim(),type=document.getElementById('asset-type').value;if(title&&safeUrl(url)!=='#'){(assets[activeEntity] ||= []).push({title,url,type});saveAssets();renderAssets()}assetDialog.querySelector('form').reset()}});
 
 const CITIES = [
  {n:1,name:'바르셀로나',meta:'3박 · 2/3–2/6 · 9~15°C',
@@ -344,12 +313,14 @@ document.getElementById('cities').innerHTML = CITIES.map((c,i)=>`
     <div class="note"><b>${c.note[0]}</b><span>${c.note[1]}</span></div>
     <p class="eat"><span>필수</span>${c.eat}</p>
     <p class="links">${c.links.map(l=>`<a href="${l[1]}" target="_blank" rel="noopener">${l[0]}</a>`).join('')}</p>
+    <div class="materials" data-entity="city-${c.n}"></div>
   </div>
 </div>
 ${c.leg?`<div class="leg"><i></i>${c.leg}</div>`:''}`).join('');
 
 document.querySelectorAll('.chead').forEach(h=>
   h.addEventListener('click',()=>h.parentElement.classList.toggle('open')));
+renderAssets();
 
 // ── 체크리스트 ──
 let saved = {};
