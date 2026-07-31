@@ -5,12 +5,21 @@
 ## 파일 구조
 
 ```
-index.html      단일 파일 앱. HTML·CSS·JS 전부 내장
-photos/         관광지 사진. {id}-{1~6}.jpg|jpeg|png|webp
-seats/          항공 좌석 배치도 (tw407-outbound.jpg, tw406-return.jpg)
+index.html            단일 파일 앱. HTML·CSS·JS 전부 내장
+sw.js                 서비스워커 (오프라인)
+manifest.webmanifest  홈 화면 추가용
+icons/                앱 아이콘 192·512. tools/mkicon.py 로 다시 생성
+photos/               관광지 사진. {id}-{1~6}.jpg|jpeg|png|webp
+seats/                항공 좌석 배치도 (tw407-outbound.jpg, tw406-return.jpg)
+app.html              옛 주소. index.html 로 넘겨주기만 함
 ```
 
-GitHub Pages로 배포. 외부 의존은 Google Fonts, Leaflet(cdnjs), 지도 타일(CARTO→OSM 폴백), 위키미디어 공용 API.
+`https://jkkms.github.io/west-europe-2027/` 에 GitHub Pages(main / root)로 배포.
+외부 의존은 Google Fonts, Leaflet(cdnjs), 지도 타일(CARTO→OSM 폴백), 위키미디어 공용 API.
+
+**`index.html`을 고쳤으면 `sw.js`의 `VERSION`을 올릴 것.** 안 올리면 이미 앱을 연 적 있는
+기기가 캐시된 옛 버전을 계속 띄운다. 버전을 올리면 앱 하단에 "새 버전이 준비됐습니다"가
+뜨고, 사용자가 누를 때 새로고침된다.
 
 ## 확정 사실 — 임의로 바꾸지 말 것
 
@@ -60,6 +69,14 @@ GitHub Pages로 배포. 외부 의존은 Google Fonts, Leaflet(cdnjs), 지도 �
 - **클래스 이름 충돌.** 섹션에 `.transit` 클래스를 붙였는데 이동일 행이 이미 `day transit`을 쓰고 있어, 인쇄 시 모든 카드가 이동일마다 잘렸음. 선택자는 `section.transit`처럼 좁힐 것.
 - **전역 `svg` 선택자 금지.** `figure.map svg{width:100%}` 같은 규칙이 Leaflet 내부 오버레이 SVG까지 잡아 경로선이 사라졌음. 인쇄용 도식에는 `.map-print`처럼 전용 클래스를 쓸 것.
 - **Chromium은 flex 컨테이너 안에서 `break-inside:avoid`를 무시.** 인쇄용으로는 `display:table` 계열로 전환.
+- **선택자 충돌 재발.** 일정 탭과 지도 탭이 둘 다 `.chip`을 쓰는데 지도 쪽 핸들러가
+  `document.querySelectorAll('.chip')`으로 전체를 잡아, 한쪽 도시를 고르면 다른 쪽 선택
+  표시가 지워졌다. 화면이 여러 개인 앱에서 공통 클래스를 다룰 때는 `#chips .chip`처럼
+  **컨테이너 id로 반드시 좁힐 것.**
+- **숨은 패널 안의 `loading="lazy"` 이미지는 안 뜬다.** 항공 탭 좌석 배치도가
+  `display:none` 상태로 시작해 lazy 관찰자에 화면 밖으로 등록됐고, 탭을 눌러 보이게 해도
+  로드가 시작되지 않았다. 탭 전환으로만 노출되는 이미지에는 lazy를 붙이지 말고
+  `width`/`height`로 자리만 잡아 둘 것.
 
 ## 사진
 
@@ -166,6 +183,16 @@ angelo  41.90306, 12.46628   산탄젤로 성
 
 `viewport`에 `maximum-scale=1`을 넣지 말 것. 확대가 막혀 접근성 문제가 생긴다.
 
+## 접근성 — 유지할 것
+
+- 펼침 행(`.dhead`)과 좌석 배치도(`.smapbtn`)는 **실제 `<button>`**. `div`에 click만 달면
+  키보드로 못 연다. 여는 쪽에서 `aria-expanded`를 같이 갱신할 것.
+- 체크리스트 `.chk`는 `role="checkbox"` + `tabindex="0"` + Space/Enter 처리 + `aria-checked`.
+- 하단/상단 탭은 `role="tablist"`, 각 패널은 `role="tabpanel"`. 탭 전환 시 `aria-selected` 갱신.
+- 사진창은 `role="dialog" aria-modal="true"`. 열 때 제목으로 초점을 옮기고, 닫을 때 원래
+  누른 요소로 되돌린다.
+- 칩은 `aria-pressed`로 선택 상태를 알린다.
+
 ## 외부 의존
 
 ```
@@ -174,3 +201,18 @@ angelo  41.90306, 12.46628   산탄젤로 성
 타일   CARTO basemaps → 4회 실패 시 tile.openstreetmap.org 자동 전환
 사진   commons.wikimedia.org API (origin=* 로 CORS 허용)
 ```
+
+## 오프라인 (sw.js)
+
+한 번 연 적이 있으면 인터넷 없이도 일정·항공·준비 탭이 그대로 열린다. 지도는 이미 본
+구역의 타일만 남는다. 캐시는 네 갈래로 나눠 두었다.
+
+| 캐시 | 대상 | 방식 |
+|---|---|---|
+| `shell-{VERSION}` | index.html, 아이콘, 좌석 배치도 | 설치할 때 미리 받음. 화면 이동은 네트워크 우선, 실패하면 캐시 |
+| `asset-{VERSION}` | 폰트, Leaflet | 캐시 우선 |
+| `photo-1` | 내 사진, 위키미디어 공용 | 캐시 우선, 120개까지 |
+| `tile-1` | 지도 타일 | 캐시 우선, 400장까지 |
+
+- **200 응답만 저장한다.** 404를 캐시하면 나중에 `photos/`에 사진을 넣어도 계속 안 보인다.
+- 경로는 전부 상대경로(`./`). GitHub Pages 하위 경로(`/west-europe-2027/`)에서 그대로 동작한다.

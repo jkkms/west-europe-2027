@@ -7,7 +7,11 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="서유럽 2027">
-<meta name="theme-color" content="#eef1f4">
+<meta name="theme-color" content="#eef1f4" media="(prefers-color-scheme:light)">
+<meta name="theme-color" content="#111a22" media="(prefers-color-scheme:dark)">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="icon" href="icons/icon-192.png" sizes="192x192">
+<link rel="apple-touch-icon" href="icons/icon-192.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
@@ -34,32 +38,12 @@ header{position:sticky;top:0;z-index:20;background:var(--paper);padding:calc(env
 .panel{display:none;padding-top:18px}.panel.on{display:block}
 .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--alpine);text-transform:uppercase;margin:0 0 4px}
 h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
-.city{background:var(--card);border:1px solid var(--frost);border-radius:12px;margin-bottom:12px;overflow:hidden}
-.chead{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer}
-.cnum{font-family:var(--mono);font-size:11px;color:var(--alpine)}
-.cname{font-family:var(--serif);font-weight:700;font-size:18px;flex:1}
-.cmeta{font-family:var(--mono);font-size:10.5px;color:var(--slate);text-align:right;line-height:1.5}
-.caret{color:var(--slate);font-size:12px;transition:transform .2s}
-.city.open .caret{transform:rotate(90deg)}
-.cbody{display:none;padding:0 16px 14px;border-top:1px solid var(--frost)}
-.city.open .cbody{display:block}
-.day{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--soft)}
-.day:last-of-type{border-bottom:0}
-.dd{font-family:var(--mono);font-size:11.5px;color:var(--slate);flex:0 0 62px;padding-top:3px}
-.da{flex:1;font-size:14.5px}
-.day.move .da{color:var(--deep)}
-.day.move .da::before{content:"→ ";font-family:var(--mono);color:var(--alpine)}
 .spot{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;border-bottom:1px dotted var(--alpine)}
 .note{display:flex;gap:10px;margin-top:12px;padding:10px 12px;background:var(--emberbg);border-left:3px solid var(--ember);border-radius:0 6px 6px 0;font-size:13px}
 .note b{font-family:var(--mono);font-size:10px;color:var(--ember);flex:0 0 auto;padding-top:2px}
-.eat{margin:12px 0 0;padding-top:11px;border-top:1px solid var(--frost);font-size:13px;color:var(--slate)}
-.eat span{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink);display:block;margin-bottom:3px}
-.links{margin:10px 0 0;font-size:13px;line-height:2}
-.links a{display:inline-block;color:var(--deep);text-decoration:none;border:1px solid var(--frost);border-radius:99px;padding:2px 11px;margin:0 5px 5px 0;font-size:12.5px}
-.leg{display:flex;align-items:center;gap:9px;padding:6px 0 14px 16px;font-family:var(--mono);font-size:11.5px;color:var(--slate)}
-.leg i{width:2px;height:16px;background:var(--alpine);display:block;border-radius:2px}
 .drow{background:var(--card);border:1px solid var(--frost);border-radius:12px;margin-bottom:8px;overflow:hidden}
-.dhead{display:flex;align-items:center;gap:12px;padding:13px 15px;cursor:pointer}
+.dhead{display:flex;align-items:center;gap:12px;padding:13px 15px;cursor:pointer;
+       width:100%;text-align:left;background:none;border:0;font:inherit;color:inherit}
 .ddate{font-family:var(--mono);font-size:13px;font-weight:500;flex:0 0 58px}
 .dcity{font-size:11px;font-family:var(--mono);color:#fff;background:var(--alpine);border-radius:99px;padding:2px 9px;flex:0 0 auto}
 .dcity.move{background:var(--moss)}
@@ -97,7 +81,7 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .frow span:first-child{color:var(--slate);font-size:13px}
 .frow span:last-child{font-family:var(--mono);font-size:13px;text-align:right}
 .seats{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.smap{width:100%;margin-top:14px;border:1px solid var(--frost);border-radius:8px;display:block;cursor:zoom-in;background:#fff}
+.smap{width:100%;height:auto;margin-top:14px;border:1px solid var(--frost);border-radius:8px;display:block;cursor:zoom-in;background:#fff}
 .seat{font-family:var(--mono);font-size:12px;background:var(--ember);color:#fff;border-radius:6px;padding:4px 10px}
 .chk{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--frost);cursor:pointer}
 .chk:last-child{border-bottom:0}
@@ -124,12 +108,30 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
 .pempty code{font-family:var(--mono);font-size:11.5px;background:var(--soft);padding:1px 5px;border-radius:4px}
 .pact{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 .pact a,.pact button{font-family:var(--mono);font-size:12px;color:var(--deep);text-decoration:none;border:1px solid var(--frost);border-radius:99px;padding:6px 13px;background:var(--card);cursor:pointer}
+.smapbtn{display:block;width:100%;padding:0;background:none;border:0;cursor:zoom-in}
+
+/* ── 키보드 초점 ── */
+:focus-visible{outline:2px solid var(--alpine);outline-offset:2px;border-radius:4px}
+.dhead:focus-visible,.chk:focus-visible{outline-offset:-2px}
+
+/* ── 새 버전 알림 ── */
+.toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav) + env(safe-area-inset-bottom) + 14px);
+       z-index:40;display:flex;align-items:center;gap:12px;max-width:calc(100% - 32px);
+       background:var(--ink);color:var(--paper);border-radius:10px;padding:11px 14px;font-size:13px;
+       box-shadow:0 4px 16px rgba(16,24,33,.28)}
+.toast[hidden]{display:none}
+.toast button{font-family:var(--mono);font-size:12px;background:none;border:1px solid currentColor;
+              color:inherit;border-radius:99px;padding:4px 12px;cursor:pointer;flex:0 0 auto}
+
+@media (prefers-reduced-motion:reduce){
+  *,*::before,*::after{transition-duration:.01ms !important;animation-duration:.01ms !important}
+}
 
 /* ── 태블릿 ── */
 @media (min-width:700px) and (max-width:899px){
   .app{max-width:660px}
   #map{height:480px}
-  .pgrid{grid-template-columns:repeat(3,1fr)}
+  .pgrid,.scards{grid-template-columns:repeat(3,1fr)}
 }
 /* ── 데스크톱: 하단 탭 → 상단 탭, 본문 확장 ── */
 @media (min-width:900px){
@@ -149,21 +151,18 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
   .panel{padding-top:24px}
   h2{font-size:23px}
   #map{height:560px}
-  .day{gap:18px;padding:12px 0}
-  .dd{flex:0 0 86px}
-  .chead{padding:16px 20px}
-  .cbody{padding:0 20px 18px}
-  .cname{font-size:19px}
+  .dhead{padding:16px 20px}
+  .dhead:hover{background:var(--soft)}
   .spot:hover{background:var(--soft)}
-  .links a:hover{border-color:var(--alpine);color:var(--alpine)}
   .chip:hover{border-color:var(--alpine)}
   .pgrid{grid-template-columns:repeat(3,1fr)}
   .scards{grid-template-columns:repeat(4,1fr)}
   .ddate{flex:0 0 70px}
   .lb{align-items:center;padding:32px}
   .lbp{border-radius:14px;max-width:720px;max-height:84vh;padding:22px 24px 26px}
-  .fcard,.city{max-width:none}
+  .fcard{max-width:none}
   .tip{font-size:13.5px}
+  .toast{bottom:24px}
 }
 /* ── 넓은 화면: 지도 탭은 더 크게 ── */
 @media (min-width:1280px){
@@ -176,16 +175,16 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
 <div class="app">
 <header><div class="brand"><h1>서유럽 13박</h1><div class="count" id="count"></div></div></header>
 
-<section class="panel on" id="p-plan">
+<section class="panel on" id="p-plan" role="tabpanel" aria-labelledby="t-plan">
   <p class="eyebrow">Itinerary</p><h2>날짜별 일정</h2>
-  <div class="chips" id="daychips"></div>
+  <div class="chips" id="daychips" role="group" aria-label="도시별 보기"></div>
   <div id="days"></div>
   <p class="tip">날짜를 누르면 그날 일정과 관광지 정보가 펼쳐집니다. 사진은 <code>photos</code> 폴더에 넣은 파일이 자동으로 표시됩니다.</p>
 </section>
 
-<section class="panel" id="p-map">
+<section class="panel" id="p-map" role="tabpanel" aria-labelledby="t-map">
   <p class="eyebrow">Map</p><h2>지도</h2>
-  <div class="chips" id="chips"></div>
+  <div class="chips" id="chips" role="group" aria-label="도시별 보기"></div>
   <div id="map"></div>
   <div class="mlegend">
     <span><i style="border-color:var(--ember)"></i>공항</span>
@@ -197,7 +196,7 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
   <p class="tip">핀을 누르면 사진과 길찾기 링크가 나옵니다. <b>숙소는 아직 비어 있습니다.</b> 파일 안의 <code>STAYS</code> 목록에 이름과 좌표를 넣으면 보라색 핀으로 표시됩니다.</p>
 </section>
 
-<section class="panel" id="p-fly">
+<section class="panel" id="p-fly" role="tabpanel" aria-labelledby="t-fly">
   <p class="eyebrow">Flights</p><h2>항공편과 좌석</h2>
 
   <div class="fcard">
@@ -208,7 +207,7 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
     <div class="frow"><span>소요</span><span>14시간 55분 · 직항</span></div>
     <div class="frow"><span>좌석</span><span>이코노미 3-4-3</span></div>
     <div class="seats"><i class="seat">39H</i><i class="seat">39K</i><i class="seat">40J</i><i class="seat">40K</i></div>
-    <img class="smap" src="seats/tw407-outbound.jpg" alt="TW0407 좌석 배치도" loading="lazy">
+    <button type="button" class="smapbtn"><img class="smap" src="seats/tw407-outbound.jpg" alt="TW0407 좌석 배치도 — 누르면 확대" width="764" height="1088"></button>
   </div>
 
   <div class="fcard">
@@ -219,7 +218,7 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
     <div class="frow"><span>소요</span><span>11시간 50분 · 직항</span></div>
     <div class="frow"><span>좌석</span><span>프리미엄 이코노미 2-4-2</span></div>
     <div class="seats"><i class="seat">7G</i><i class="seat">7H</i><i class="seat">8G</i><i class="seat">8H</i></div>
-    <img class="smap" src="seats/tw406-return.jpg" alt="TW0406 좌석 배치도" loading="lazy">
+    <button type="button" class="smapbtn"><img class="smap" src="seats/tw406-return.jpg" alt="TW0406 좌석 배치도 — 누르면 확대" width="712" height="1088"></button>
   </div>
 
   <div class="note"><b>출발일</b><span>2/16 로마 출발이 19:00이므로 공항에 16:00까지는 도착해야 합니다. 시내에서 15:00쯤 출발한다고 보고 그날 일정을 짜세요.</span></div>
@@ -229,24 +228,28 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
   <p class="tip">티웨이 B777-300ER 기준 프리미엄 이코노미는 좌석 간격 36~38인치·폭 19.5인치, 일반 이코노미는 32인치·17.2인치입니다. 기내 엔터테인먼트 콘텐츠가 없으니 태블릿에 영상을 미리 받아 가세요. 배치도를 누르면 확대됩니다.</p>
 </section>
 
-<section class="panel" id="p-todo">
+<section class="panel" id="p-todo" role="tabpanel" aria-labelledby="t-todo">
   <p class="eyebrow">Before you go</p><h2>예약 체크리스트</h2>
   <div id="todos"></div>
   <p class="tip">체크 상태는 이 기기에만 저장됩니다.</p>
 </section>
 </div>
 
-<nav>
-  <button class="on" data-t="plan"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>일정</button>
-  <button data-t="map"><svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>지도</button>
-  <button data-t="fly"><svg viewBox="0 0 24 24"><path d="M12 2c1.3 0 2 1.5 2 3v5l7 4v2l-7-2-2 2-2-2-7 2v-2l7-4V5c0-1.5.7-3 2-3Z"/></svg>항공</button>
-  <button data-t="todo"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>준비</button>
+<nav role="tablist" aria-label="화면">
+  <button class="on" id="t-plan" role="tab" aria-selected="true" aria-controls="p-plan" data-t="plan"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>일정</button>
+  <button id="t-map" role="tab" aria-selected="false" aria-controls="p-map" data-t="map"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>지도</button>
+  <button id="t-fly" role="tab" aria-selected="false" aria-controls="p-fly" data-t="fly"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2c1.3 0 2 1.5 2 3v5l7 4v2l-7-2-2 2-2-2-7 2v-2l7-4V5c0-1.5.7-3 2-3Z"/></svg>항공</button>
+  <button id="t-todo" role="tab" aria-selected="false" aria-controls="p-todo" data-t="todo"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>준비</button>
 </nav>
 
-<div id="lb" class="lb" hidden><div class="lbp">
-  <div class="lbh"><h3 id="lbt"></h3><button class="lbx" aria-label="닫기">✕</button></div>
+<div id="lb" class="lb" hidden><div class="lbp" role="dialog" aria-modal="true" aria-labelledby="lbt">
+  <div class="lbh"><h3 id="lbt" tabindex="-1"></h3><button class="lbx" type="button" aria-label="닫기">✕</button></div>
   <div id="lbb"></div>
 </div></div>
+
+<div id="toast" class="toast" role="status" hidden>
+  <span>새 버전이 준비됐습니다.</span><button type="button" id="toastbtn">새로고침</button>
+</div>
 
 <script>
 /* ═══════════════════════════════════════════════════════════════
@@ -421,9 +424,6 @@ async function commons(id,limit){
   _cc.set(key,out); return out;
 }
 
-const tok = s => s.replace(/\{(\w+)\}/g,(m,id)=>
-  byId[id] ? '<button class="spot" data-id="'+id+'">'+byId[id].n+'</button>' : m);
-
 const nowKey=(new Date().getMonth()+1)+'/'+new Date().getDate();
 function spotCard(id){
   const L=byId[id]||{n:id};
@@ -432,19 +432,23 @@ function spotCard(id){
 }
 function renderDays(filter){
   const list = filter&&filter!=='전체' ? DAYS.filter(d=>d.c===filter) : DAYS;
-  document.getElementById('days').innerHTML = list.map(d=>
+  document.getElementById('days').innerHTML = list.map((d,i)=>
    '<div class="drow'+(d.d===nowKey?' today':'')+'">'+
-     '<div class="dhead"><span class="ddate">'+d.d+' '+d.w+'</span>'+
+     '<button type="button" class="dhead" aria-expanded="false" aria-controls="db'+i+'">'+
+       '<span class="ddate">'+d.d+' '+d.w+'</span>'+
        '<span class="dcity'+(d.c==='이동'?' move':'')+'">'+d.c+'</span>'+
-       '<span class="dtitle">'+d.t+'</span><span class="dcaret">▸</span></div>'+
-     '<div class="dbody"><p class="dplan">'+d.plan+'</p>'+
+       '<span class="dtitle">'+d.t+'</span><span class="dcaret" aria-hidden="true">▸</span></button>'+
+     '<div class="dbody" id="db'+i+'"><p class="dplan">'+d.plan+'</p>'+
        (d.note.length?'<div class="dnote"><b>'+d.note[0]+'</b><span>'+d.note[1]+'</span></div>':'')+
        (d.spots.length?'<div class="scards">'+d.spots.map(spotCard).join('')+'</div>':'')+
      '</div></div>').join('');
   document.querySelectorAll('.dhead').forEach(h=>h.addEventListener('click',()=>{
-    const r=h.parentElement; r.classList.toggle('open');
-    if(r.classList.contains('open')) r.querySelectorAll('.sph').forEach(fillThumb);
+    const r=h.parentElement, open=r.classList.toggle('open');
+    h.setAttribute('aria-expanded',open?'true':'false');
+    if(open) r.querySelectorAll('.sph').forEach(fillThumb);
   }));
+  /* 오늘 날짜는 필터를 바꿔도 계속 펼쳐 둔다 */
+  document.querySelectorAll('.drow.today .dhead').forEach(h=>h.click());
 }
 async function fillThumb(el){
   if(el.dataset.done) return; el.dataset.done='1';
@@ -459,18 +463,31 @@ async function firstPhoto(id){
 }
 const DCHIPS=['전체','바르셀로나','파리','인터라켄','피렌체','로마','이동'];
 document.getElementById('daychips').innerHTML=DCHIPS.map((c,i)=>
-  '<button class="chip'+(i===0?' on':'')+'" data-d="'+c+'">'+c+'</button>').join('');
+  '<button type="button" class="chip'+(i===0?' on':'')+'" aria-pressed="'+(i===0)+'" data-d="'+c+'">'+c+'</button>').join('');
 document.querySelectorAll('#daychips .chip').forEach(ch=>ch.addEventListener('click',()=>{
-  document.querySelectorAll('#daychips .chip').forEach(x=>x.classList.remove('on'));
-  ch.classList.add('on'); renderDays(ch.dataset.d);
+  document.querySelectorAll('#daychips .chip').forEach(x=>{
+    x.classList.remove('on'); x.setAttribute('aria-pressed','false');
+  });
+  ch.classList.add('on'); ch.setAttribute('aria-pressed','true'); renderDays(ch.dataset.d);
 }));
 renderDays('전체');
-document.querySelectorAll('.drow.today .dhead').forEach(h=>h.click());
 
 const lb=document.getElementById('lb'),lbt=document.getElementById('lbt'),lbb=document.getElementById('lbb');
-function probe(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(src);i.onerror=()=>r(null);i.src=src;});}
+/* 같은 경로를 여러 번 확인하지 않도록 결과를 기억해 둔다.
+   사진이 없는 곳은 확장자 4개 × 6장 = 최대 24번의 404가 나므로 캐시가 특히 중요하다. */
+const _pc=new Map();
+function probe(src){
+  if(_pc.has(src)) return _pc.get(src);
+  const p=new Promise(r=>{const i=new Image();i.onload=()=>r(src);i.onerror=()=>r(null);i.src=src;});
+  _pc.set(src,p); return p;
+}
+const _collected=new Map();
 async function collect(id){
   if(PHOTOS[id]&&PHOTOS[id].length) return PHOTOS[id];
+  if(_collected.has(id)) return _collected.get(id);
+  const p=_collectRaw(id); _collected.set(id,p); return p;
+}
+async function _collectRaw(id){
   const out=[];
   for(let n=1;n<=6;n++){
     let hit=null;
@@ -482,11 +499,17 @@ async function collect(id){
 }
 function acts(L){
   return '<div class="pact"><a href="https://www.google.com/maps/dir/?api=1&destination='+L.lat+','+L.lng+
-         '" target="_blank" rel="noopener">길찾기</a><button class="gomap" data-id="'+L.id+'">앱 지도에서 보기</button></div>';
+         '" target="_blank" rel="noopener">길찾기</a><button type="button" class="gomap" data-id="'+L.id+'">앱 지도에서 보기</button></div>';
+}
+let lastFocus=null;
+function openLb(title){
+  lastFocus=document.activeElement;
+  lbt.textContent=title; lb.hidden=false; document.body.style.overflow='hidden';
+  lbt.focus();
 }
 async function openSpot(id){
   const L=byId[id]; if(!L) return;
-  lbt.textContent=L.n; lb.hidden=false; document.body.style.overflow='hidden';
+  openLb(L.n);
   lbb.innerHTML=acts(L)+'<p class="pempty">사진 불러오는 중…</p>';
   let imgs=await collect(id), credit='';
   if(!imgs.length){
@@ -501,11 +524,16 @@ async function openSpot(id){
     ? '<div class="pgrid">'+imgs.map(s=>'<img src="'+s+'" alt="" loading="lazy">').join('')+'</div>'+credit
     : '<p class="pempty">사진을 찾지 못했습니다. <code>photos</code> 폴더에 <code>'+id+'-1.jpg</code> 로 저장하면 표시됩니다.</p>');
 }
-function closeLb(){lb.hidden=true;lbb.innerHTML='';document.body.style.overflow='';}
+function closeLb(){
+  lb.hidden=true; lbb.innerHTML=''; document.body.style.overflow='';
+  if(lastFocus&&lastFocus.isConnected) lastFocus.focus();
+  lastFocus=null;
+}
 document.addEventListener('click',e=>{
-  const sm=e.target.closest('.smap');
-  if(sm){ lbt.textContent=sm.alt; lbb.innerHTML='<img src="'+sm.src+'" alt="" style="width:100%;border-radius:8px;margin-top:14px;background:#fff">';
-          lb.hidden=false; document.body.style.overflow='hidden'; return; }
+  const sm=e.target.closest('.smapbtn');
+  if(sm){ const im=sm.querySelector('.smap');
+          lbb.innerHTML='<img src="'+im.src+'" alt="'+im.alt+'" style="width:100%;border-radius:8px;margin-top:14px;background:#fff">';
+          openLb(im.alt.split(' — ')[0]); return; }
   const g=e.target.closest('.gomap');
   if(g){const id=g.dataset.id;closeLb();showTab('map');focusOn(id);return;}
   const b=e.target.closest('.spot'); if(b){openSpot(b.dataset.id);return;}
@@ -515,15 +543,27 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!lb.hidden)closeLb(
 
 let saved={}; try{saved=JSON.parse(localStorage.getItem('trip27')||'{}');}catch(e){}
 document.getElementById('todos').innerHTML=TODOS.map((t,i)=>
-'<div class="chk'+(saved[i]?' done':'')+'" data-i="'+i+'"><span class="box">✓</span>'+
+'<div class="chk'+(saved[i]?' done':'')+'" data-i="'+i+'" role="checkbox" tabindex="0"'+
+' aria-checked="'+(saved[i]?'true':'false')+'"><span class="box" aria-hidden="true">✓</span>'+
 '<span class="ctext"><b>'+t[0]+'</b><span class="cwhen">'+t[1]+'</span>'+t[2]+'</span></div>').join('');
-document.querySelectorAll('.chk').forEach(el=>el.addEventListener('click',()=>{
-  el.classList.toggle('done'); saved[el.dataset.i]=el.classList.contains('done');
-  try{localStorage.setItem('trip27',JSON.stringify(saved));}catch(e){}
-}));
+document.querySelectorAll('.chk').forEach(el=>{
+  const toggle=()=>{
+    const on=el.classList.toggle('done');
+    el.setAttribute('aria-checked',on?'true':'false');
+    saved[el.dataset.i]=on;
+    try{localStorage.setItem('trip27',JSON.stringify(saved));}catch(e){}
+  };
+  el.addEventListener('click',toggle);
+  el.addEventListener('keydown',e=>{
+    if(e.key===' '||e.key==='Enter'){e.preventDefault();toggle();}
+  });
+});
 
 function showTab(t){
-  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
+  document.querySelectorAll('nav button').forEach(x=>{
+    const on=x.dataset.t===t;
+    x.classList.toggle('on',on); x.setAttribute('aria-selected',on?'true':'false');
+  });
   document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on',x.id==='p-'+t));
   window.scrollTo({top:0});
   if(t==='map'&&map) setTimeout(()=>map.invalidateSize(),120);
@@ -549,13 +589,16 @@ function focusOn(id){
 window.addEventListener('load',()=>{
   if(typeof L==='undefined'){
     document.getElementById('map').outerHTML='<p class="tip">지도를 불러오지 못했습니다. 인터넷 연결을 확인해 주세요.</p>';return;}
-  const dark=window.matchMedia('(prefers-color-scheme: dark)').matches;
-  map=L.map('map',{scrollWheelZoom:false});
+  const darkQ=window.matchMedia('(prefers-color-scheme: dark)');
+  // 마우스 휠 확대는 데스크톱에서만. 모바일에서는 페이지 스크롤을 가로채므로 끈다.
+  map=L.map('map',{scrollWheelZoom:window.matchMedia('(min-width:900px)').matches});
   // 기본 타일이 막히면 OpenStreetMap 기본 서버로 자동 전환
-  let tileErr=0, swapped=false;
-  let layer=L.tileLayer('https://{s}.basemaps.cartocdn.com/'+(dark?'dark_all':'light_all')+'/{z}/{x}/{y}{r}.png',
-    {maxZoom:19,attribution:'&copy; OpenStreetMap &copy; CARTO'}).addTo(map);
-  layer.on('tileerror',()=>{
+  let tileErr=0, swapped=false, layer=null;
+  function carto(){
+    return L.tileLayer('https://{s}.basemaps.cartocdn.com/'+(darkQ.matches?'dark_all':'light_all')+'/{z}/{x}/{y}{r}.png',
+      {maxZoom:19,attribution:'&copy; OpenStreetMap &copy; CARTO'});
+  }
+  function onTileErr(){
     if(swapped) return;
     if(++tileErr>=4){
       swapped=true; map.removeLayer(layer);
@@ -563,25 +606,68 @@ window.addEventListener('load',()=>{
         {maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
       const n=document.getElementById('tilenote'); if(n) n.hidden=false;
     }
-  });
+  }
+  layer=carto().addTo(map); layer.on('tileerror',onTileErr);
+  // 기기 테마가 바뀌면 밝은/어두운 지도로 따라 바꾼다
+  const onTheme=()=>{
+    if(swapped) return;
+    map.removeLayer(layer);
+    layer=carto().addTo(map); layer.on('tileerror',onTileErr);
+  };
+  if(darkQ.addEventListener) darkQ.addEventListener('change',onTheme);
+  else if(darkQ.addListener) darkQ.addListener(onTheme);
   const ICON={air:'✈',rail:'🚉',see:'★',stay:'🛏'};
   ALL.forEach(l=>{
     const m=L.marker([l.lat,l.lng],{icon:L.divIcon({className:'',
       html:'<div class="pin '+l.t+'">'+(ICON[l.t]||'★')+'</div>',iconSize:[26,26],iconAnchor:[13,13]}),title:l.n}).addTo(map);
     m.bindPopup('<b>'+l.n+'</b><a href="https://www.google.com/maps/dir/?api=1&destination='+l.lat+','+l.lng+
-      '" target="_blank" rel="noopener">길찾기</a><button class="spot" data-id="'+l.id+'">사진</button>');
+      '" target="_blank" rel="noopener">길찾기</a><button type="button" class="spot" data-id="'+l.id+'">사진</button>');
     marks[l.id]=m;
   });
   document.getElementById('chips').innerHTML=CITY_NAMES.map((c,i)=>
-    '<button class="chip'+(i===0?' on':'')+'" data-c="'+c+'">'+c+'</button>').join('');
-  document.querySelectorAll('.chip').forEach(ch=>ch.addEventListener('click',()=>{
-    document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
-    ch.classList.add('on'); fit(ch.dataset.c);
+    '<button type="button" class="chip'+(i===0?' on':'')+'" aria-pressed="'+(i===0)+'" data-c="'+c+'">'+c+'</button>').join('');
+  /* 선택자를 #chips 안으로 좁힌다. 그냥 '.chip' 이면 일정 탭 칩까지 잡혀서
+     한쪽을 누를 때마다 다른 쪽 선택 표시가 지워진다. */
+  document.querySelectorAll('#chips .chip').forEach(ch=>ch.addEventListener('click',()=>{
+    document.querySelectorAll('#chips .chip').forEach(x=>{
+      x.classList.remove('on'); x.setAttribute('aria-pressed','false');
+    });
+    ch.classList.add('on'); ch.setAttribute('aria-pressed','true'); fit(ch.dataset.c);
   }));
   fit('전체');
   setTimeout(()=>map.invalidateSize(),250);
   window.addEventListener('resize',()=>map.invalidateSize());
 });
+
+/* ── 오프라인 지원 ────────────────────────────────────────────────
+   한 번 연 적이 있으면 인터넷 없이도 일정·항공·준비 탭이 그대로 열립니다.
+   지도는 이미 본 구역의 타일만 남아 있습니다.
+   새 버전이 올라오면 바로 갈아끼우지 않고 아래쪽에 알림을 띄운 뒤,
+   사용자가 누를 때 새로고침합니다. (보던 화면이 갑자기 사라지지 않도록)
+   ────────────────────────────────────────────────────────────── */
+if('serviceWorker' in navigator && location.protocol!=='file:'){
+  window.addEventListener('load',()=>{
+    navigator.serviceWorker.register('sw.js').then(reg=>{
+      const toast=document.getElementById('toast');
+      const offer=w=>{
+        if(!navigator.serviceWorker.controller) return; // 첫 설치는 알릴 것이 없다
+        toast.hidden=false;
+        document.getElementById('toastbtn').onclick=()=>{
+          toast.hidden=true; w.postMessage('SKIP_WAITING');
+        };
+      };
+      if(reg.waiting) offer(reg.waiting);
+      reg.addEventListener('updatefound',()=>{
+        const w=reg.installing; if(!w) return;
+        w.addEventListener('statechange',()=>{ if(w.state==='installed') offer(w); });
+      });
+    }).catch(()=>{});
+    let reloading=false;
+    navigator.serviceWorker.addEventListener('controllerchange',()=>{
+      if(reloading) return; reloading=true; location.reload();
+    });
+  });
+}
 </script>
 </body>
 </html>
