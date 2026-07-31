@@ -1,5 +1,587 @@
-<!doctype html>
+<!DOCTYPE html>
 <html lang="ko">
-<head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><title>서유럽 2027</title></head>
-<body><script>location.replace('app.html'+location.search+location.hash)</script></body>
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>서유럽 2027</title>
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-title" content="서유럽 2027">
+<meta name="theme-color" content="#eef1f4">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Gowun+Batang:wght@400;700&family=IBM+Plex+Mono:wght@400;500&family=IBM+Plex+Sans+KR:wght@300;400;500;600&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
+<style>
+:root{
+  --ink:#16202b;--slate:#5a6b7a;--paper:#eef1f4;--card:#fff;--frost:#d5dee5;--soft:#e6ebef;
+  --alpine:#2e6e8e;--deep:#1d4f68;--ember:#b64f2b;--emberbg:#f6ece7;--moss:#4a7a5e;--plum:#7c5cbf;
+  --sans:'IBM Plex Sans KR',system-ui,sans-serif;
+  --mono:'IBM Plex Mono','IBM Plex Sans KR',monospace;
+  --serif:'Gowun Batang',serif;--nav:64px;
+}
+@media (prefers-color-scheme:dark){:root{
+  --ink:#e8edf1;--slate:#9aa9b6;--paper:#111a22;--card:#18232d;--frost:#2b3945;--soft:#223039;
+  --alpine:#6aa9c6;--deep:#8fc3da;--ember:#d97a52;--emberbg:#2a1e18;--moss:#7fb094;--plum:#a58ae0;}}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-weight:300;font-size:15px;line-height:1.7}
+.app{max-width:520px;margin:0 auto;padding:0 16px calc(var(--nav) + env(safe-area-inset-bottom) + 24px)}
+header{position:sticky;top:0;z-index:20;background:var(--paper);padding:calc(env(safe-area-inset-top) + 14px) 0 10px;border-bottom:1px solid var(--frost)}
+.brand{display:flex;align-items:baseline;justify-content:space-between;gap:10px}
+.brand h1{font-family:var(--serif);font-weight:700;font-size:21px;margin:0}
+.count{font-family:var(--mono);font-size:11px;color:var(--alpine);text-align:right;line-height:1.5}
+.panel{display:none;padding-top:18px}.panel.on{display:block}
+.eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--alpine);text-transform:uppercase;margin:0 0 4px}
+h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
+.city{background:var(--card);border:1px solid var(--frost);border-radius:12px;margin-bottom:12px;overflow:hidden}
+.chead{display:flex;align-items:center;gap:10px;padding:14px 16px;cursor:pointer}
+.cnum{font-family:var(--mono);font-size:11px;color:var(--alpine)}
+.cname{font-family:var(--serif);font-weight:700;font-size:18px;flex:1}
+.cmeta{font-family:var(--mono);font-size:10.5px;color:var(--slate);text-align:right;line-height:1.5}
+.caret{color:var(--slate);font-size:12px;transition:transform .2s}
+.city.open .caret{transform:rotate(90deg)}
+.cbody{display:none;padding:0 16px 14px;border-top:1px solid var(--frost)}
+.city.open .cbody{display:block}
+.day{display:flex;gap:12px;padding:10px 0;border-bottom:1px solid var(--soft)}
+.day:last-of-type{border-bottom:0}
+.dd{font-family:var(--mono);font-size:11.5px;color:var(--slate);flex:0 0 62px;padding-top:3px}
+.da{flex:1;font-size:14.5px}
+.day.move .da{color:var(--deep)}
+.day.move .da::before{content:"→ ";font-family:var(--mono);color:var(--alpine)}
+.spot{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;border-bottom:1px dotted var(--alpine)}
+.note{display:flex;gap:10px;margin-top:12px;padding:10px 12px;background:var(--emberbg);border-left:3px solid var(--ember);border-radius:0 6px 6px 0;font-size:13px}
+.note b{font-family:var(--mono);font-size:10px;color:var(--ember);flex:0 0 auto;padding-top:2px}
+.eat{margin:12px 0 0;padding-top:11px;border-top:1px solid var(--frost);font-size:13px;color:var(--slate)}
+.eat span{font-family:var(--mono);font-size:10px;letter-spacing:.1em;color:var(--ink);display:block;margin-bottom:3px}
+.links{margin:10px 0 0;font-size:13px;line-height:2}
+.links a{display:inline-block;color:var(--deep);text-decoration:none;border:1px solid var(--frost);border-radius:99px;padding:2px 11px;margin:0 5px 5px 0;font-size:12.5px}
+.leg{display:flex;align-items:center;gap:9px;padding:6px 0 14px 16px;font-family:var(--mono);font-size:11.5px;color:var(--slate)}
+.leg i{width:2px;height:16px;background:var(--alpine);display:block;border-radius:2px}
+.drow{background:var(--card);border:1px solid var(--frost);border-radius:12px;margin-bottom:8px;overflow:hidden}
+.dhead{display:flex;align-items:center;gap:12px;padding:13px 15px;cursor:pointer}
+.ddate{font-family:var(--mono);font-size:13px;font-weight:500;flex:0 0 58px}
+.dcity{font-size:11px;font-family:var(--mono);color:#fff;background:var(--alpine);border-radius:99px;padding:2px 9px;flex:0 0 auto}
+.dcity.move{background:var(--moss)}
+.dtitle{flex:1;font-size:14px;line-height:1.5;color:var(--slate)}
+.dcaret{color:var(--slate);font-size:12px;transition:transform .2s;flex:0 0 auto}
+.drow.open .dcaret{transform:rotate(90deg)}
+.drow.today{border-color:var(--alpine);border-width:2px}
+.dbody{display:none;padding:0 15px 15px;border-top:1px solid var(--frost)}
+.drow.open .dbody{display:block}
+.dplan{font-size:14.5px;line-height:1.75;padding:13px 0 0}
+.dnote{display:flex;gap:10px;margin-top:12px;padding:10px 12px;background:var(--emberbg);border-left:3px solid var(--ember);border-radius:0 6px 6px 0;font-size:13px;line-height:1.6}
+.dnote b{font-family:var(--mono);font-size:10px;color:var(--ember);flex:0 0 auto;padding-top:2px}
+.scards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.scard{background:var(--soft);border-radius:10px;overflow:hidden;border:1px solid var(--frost)}
+.sthumb{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--soft)}
+.sph{width:100%;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10.5px;color:var(--slate);background:var(--soft)}
+.sbody{padding:8px 10px 10px}
+.sbody b{display:block;font-size:13px;font-weight:500;line-height:1.35}
+.sbody span{display:block;font-size:11.5px;color:var(--slate);line-height:1.5;margin-top:3px}
+.chips{display:flex;gap:6px;overflow-x:auto;padding:0 0 12px}
+.chip{flex:0 0 auto;font-family:var(--mono);font-size:12px;padding:6px 13px;border-radius:99px;border:1px solid var(--frost);background:var(--card);color:var(--slate);cursor:pointer}
+.chip.on{background:var(--alpine);border-color:var(--alpine);color:#fff}
+#map{height:420px;border:1px solid var(--frost);border-radius:12px;background:var(--soft)}
+.pin{width:26px;height:26px;border-radius:50%;background:var(--card);border:2.5px solid var(--alpine);display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 1px 4px rgba(22,32,43,.3)}
+.pin.air{border-color:var(--ember)}.pin.rail{border-color:var(--moss)}.pin.stay{border-color:var(--plum)}
+.leaflet-container{font-family:var(--sans)}
+.leaflet-popup-content{margin:11px 13px;font-size:14px}
+.leaflet-popup-content b{font-family:var(--serif);font-size:15px;display:block;margin-bottom:5px}
+.leaflet-popup-content a,.leaflet-popup-content button{font-family:var(--mono);font-size:12px;color:var(--alpine);text-decoration:none;background:none;border:0;padding:0;cursor:pointer;margin-right:10px}
+.mlegend{display:flex;flex-wrap:wrap;gap:10px 16px;padding:12px 2px 0;font-family:var(--mono);font-size:11.5px;color:var(--slate)}
+.mlegend i{display:inline-block;width:10px;height:10px;border-radius:50%;border:2.5px solid;margin-right:5px;vertical-align:-1px}
+.fcard{background:var(--card);border:1px solid var(--frost);border-radius:12px;padding:16px;margin-bottom:12px}
+.frow{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--soft);font-size:14px}
+.frow:last-child{border-bottom:0}
+.frow span:first-child{color:var(--slate);font-size:13px}
+.frow span:last-child{font-family:var(--mono);font-size:13px;text-align:right}
+.seats{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
+.smap{width:100%;margin-top:14px;border:1px solid var(--frost);border-radius:8px;display:block;cursor:zoom-in;background:#fff}
+.seat{font-family:var(--mono);font-size:12px;background:var(--ember);color:#fff;border-radius:6px;padding:4px 10px}
+.chk{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--frost);cursor:pointer}
+.chk:last-child{border-bottom:0}
+.box{flex:0 0 20px;height:20px;border:1.5px solid var(--frost);border-radius:5px;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff}
+.chk.done .box{background:var(--alpine);border-color:var(--alpine)}
+.chk.done .ctext{color:var(--slate);text-decoration:line-through}
+.ctext{flex:1;font-size:14px}.ctext b{font-weight:500}
+.cwhen{font-family:var(--mono);font-size:11px;color:var(--alpine);display:block;margin-top:2px}
+nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--frost);display:flex;padding-bottom:env(safe-area-inset-bottom)}
+nav button{flex:1;background:none;border:0;padding:9px 0 8px;font-family:var(--sans);font-size:10.5px;color:var(--slate);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
+nav button.on{color:var(--alpine);font-weight:500}
+nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
+.tip{font-size:12.5px;color:var(--slate);line-height:1.75;margin:16px 0 0;padding:12px;background:var(--card);border:1px solid var(--frost);border-radius:10px}
+.tip code{font-family:var(--mono);font-size:11.5px;background:var(--soft);padding:1px 5px;border-radius:4px}
+.lb{position:fixed;inset:0;z-index:9999;background:rgba(16,24,33,.72);display:flex;align-items:flex-end;justify-content:center}
+.lb[hidden]{display:none}
+.lbp{background:var(--card);width:100%;max-width:520px;max-height:88vh;overflow-y:auto;border-radius:16px 16px 0 0;padding:18px 18px calc(20px + env(safe-area-inset-bottom))}
+.lbh{display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--frost)}
+.lbh h3{font-family:var(--serif);font-weight:700;font-size:19px;margin:0;flex:1}
+.lbx{font-size:19px;background:none;border:1px solid var(--frost);color:var(--slate);width:32px;height:32px;border-radius:8px;cursor:pointer}
+.pgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.pgrid img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;background:var(--soft);display:block}
+.pempty{font-size:13px;color:var(--slate);line-height:1.75;margin-top:14px}
+.pempty code{font-family:var(--mono);font-size:11.5px;background:var(--soft);padding:1px 5px;border-radius:4px}
+.pact{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
+.pact a,.pact button{font-family:var(--mono);font-size:12px;color:var(--deep);text-decoration:none;border:1px solid var(--frost);border-radius:99px;padding:6px 13px;background:var(--card);cursor:pointer}
+
+/* ── 태블릿 ── */
+@media (min-width:700px) and (max-width:899px){
+  .app{max-width:660px}
+  #map{height:480px}
+  .pgrid{grid-template-columns:repeat(3,1fr)}
+}
+/* ── 데스크톱: 하단 탭 → 상단 탭, 본문 확장 ── */
+@media (min-width:900px){
+  :root{--nav:0px}
+  body{padding-top:58px;font-size:16px}
+  nav{top:0;bottom:auto;border-top:0;border-bottom:1px solid var(--frost);
+      justify-content:center;padding:0}
+  nav button{flex:0 0 auto;flex-direction:row;gap:9px;padding:16px 26px;font-size:14px;
+             border-bottom:2px solid transparent;transition:color .15s}
+  nav button.on{border-bottom-color:var(--alpine)}
+  nav button:hover{color:var(--ink)}
+  nav svg{width:18px;height:18px}
+  header{top:58px;padding:26px 0 14px}
+  .app{max-width:920px;padding:0 28px 72px}
+  .brand h1{font-size:26px}
+  .count{font-size:12px}
+  .panel{padding-top:24px}
+  h2{font-size:23px}
+  #map{height:560px}
+  .day{gap:18px;padding:12px 0}
+  .dd{flex:0 0 86px}
+  .chead{padding:16px 20px}
+  .cbody{padding:0 20px 18px}
+  .cname{font-size:19px}
+  .spot:hover{background:var(--soft)}
+  .links a:hover{border-color:var(--alpine);color:var(--alpine)}
+  .chip:hover{border-color:var(--alpine)}
+  .pgrid{grid-template-columns:repeat(3,1fr)}
+  .scards{grid-template-columns:repeat(4,1fr)}
+  .ddate{flex:0 0 70px}
+  .lb{align-items:center;padding:32px}
+  .lbp{border-radius:14px;max-width:720px;max-height:84vh;padding:22px 24px 26px}
+  .fcard,.city{max-width:none}
+  .tip{font-size:13.5px}
+}
+/* ── 넓은 화면: 지도 탭은 더 크게 ── */
+@media (min-width:1280px){
+  .app{max-width:1080px}
+  #map{height:640px}
+}
+</style>
+</head>
+<body>
+<div class="app">
+<header><div class="brand"><h1>서유럽 13박</h1><div class="count" id="count"></div></div></header>
+
+<section class="panel on" id="p-plan">
+  <p class="eyebrow">Itinerary</p><h2>날짜별 일정</h2>
+  <div class="chips" id="daychips"></div>
+  <div id="days"></div>
+  <p class="tip">날짜를 누르면 그날 일정과 관광지 정보가 펼쳐집니다. 사진은 <code>photos</code> 폴더에 넣은 파일이 자동으로 표시됩니다.</p>
+</section>
+
+<section class="panel" id="p-map">
+  <p class="eyebrow">Map</p><h2>지도</h2>
+  <div class="chips" id="chips"></div>
+  <div id="map"></div>
+  <div class="mlegend">
+    <span><i style="border-color:var(--ember)"></i>공항</span>
+    <span><i style="border-color:var(--moss)"></i>기차역</span>
+    <span><i style="border-color:var(--alpine)"></i>관광지</span>
+    <span><i style="border-color:var(--plum)"></i>숙소</span>
+  </div>
+  <p class="tip" id="tilenote" hidden>기본 지도 서버에 연결하지 못해 OpenStreetMap 기본 지도로 전환했습니다. 위치와 기능은 동일합니다.</p>
+  <p class="tip">핀을 누르면 사진과 길찾기 링크가 나옵니다. <b>숙소는 아직 비어 있습니다.</b> 파일 안의 <code>STAYS</code> 목록에 이름과 좌표를 넣으면 보라색 핀으로 표시됩니다.</p>
+</section>
+
+<section class="panel" id="p-fly">
+  <p class="eyebrow">Flights</p><h2>항공편과 좌석</h2>
+
+  <div class="fcard">
+    <div class="frow"><span>1구간</span><span>서울 ICN → 바르셀로나 BCN</span></div>
+    <div class="frow"><span>항공사 · 편명</span><span>티웨이항공 TW0407</span></div>
+    <div class="frow"><span>출발</span><span>2/3 수 11:30 · 인천 T1</span></div>
+    <div class="frow"><span>도착</span><span>2/3 수 18:25 · 엘프라트 T2</span></div>
+    <div class="frow"><span>소요</span><span>14시간 55분 · 직항</span></div>
+    <div class="frow"><span>좌석</span><span>이코노미 3-4-3</span></div>
+    <div class="seats"><i class="seat">39H</i><i class="seat">39K</i><i class="seat">40J</i><i class="seat">40K</i></div>
+    <img class="smap" src="seats/tw407-outbound.jpg" alt="TW0407 좌석 배치도" loading="lazy">
+  </div>
+
+  <div class="fcard">
+    <div class="frow"><span>2구간</span><span>로마 FCO → 서울 ICN</span></div>
+    <div class="frow"><span>항공사 · 편명</span><span>티웨이항공 TW0406</span></div>
+    <div class="frow"><span>출발</span><span>2/16 화 19:00 · 피우미치노 T3</span></div>
+    <div class="frow"><span>도착</span><span>2/17 수 14:50 · 인천 T1</span></div>
+    <div class="frow"><span>소요</span><span>11시간 50분 · 직항</span></div>
+    <div class="frow"><span>좌석</span><span>프리미엄 이코노미 2-4-2</span></div>
+    <div class="seats"><i class="seat">7G</i><i class="seat">7H</i><i class="seat">8G</i><i class="seat">8H</i></div>
+    <img class="smap" src="seats/tw406-return.jpg" alt="TW0406 좌석 배치도" loading="lazy">
+  </div>
+
+  <div class="note"><b>출발일</b><span>2/16 로마 출발이 19:00이므로 공항에 16:00까지는 도착해야 합니다. 시내에서 15:00쯤 출발한다고 보고 그날 일정을 짜세요.</span></div>
+
+  <div class="note"><b>좌석</b><span>39열과 7열은 앞이 벽인 맨 앞열입니다. 발밑 수납이 없어 이착륙 때 짐을 머리 위 선반에 넣어야 하고 팔걸이가 고정입니다. 앞쪽에 유아 요람 거치 위치가 있어 아기 동반석이 배정될 수 있습니다.</span></div>
+
+  <p class="tip">티웨이 B777-300ER 기준 프리미엄 이코노미는 좌석 간격 36~38인치·폭 19.5인치, 일반 이코노미는 32인치·17.2인치입니다. 기내 엔터테인먼트 콘텐츠가 없으니 태블릿에 영상을 미리 받아 가세요. 배치도를 누르면 확대됩니다.</p>
+</section>
+
+<section class="panel" id="p-todo">
+  <p class="eyebrow">Before you go</p><h2>예약 체크리스트</h2>
+  <div id="todos"></div>
+  <p class="tip">체크 상태는 이 기기에만 저장됩니다.</p>
+</section>
+</div>
+
+<nav>
+  <button class="on" data-t="plan"><svg viewBox="0 0 24 24"><rect x="3" y="5" width="18" height="16" rx="2"/><path d="M8 3v4M16 3v4M3 11h18"/></svg>일정</button>
+  <button data-t="map"><svg viewBox="0 0 24 24"><path d="M9 4 3 6v14l6-2 6 2 6-2V4l-6 2-6-2Z"/><path d="M9 4v14M15 6v14"/></svg>지도</button>
+  <button data-t="fly"><svg viewBox="0 0 24 24"><path d="M12 2c1.3 0 2 1.5 2 3v5l7 4v2l-7-2-2 2-2-2-7 2v-2l7-4V5c0-1.5.7-3 2-3Z"/></svg>항공</button>
+  <button data-t="todo"><svg viewBox="0 0 24 24"><path d="M9 11l3 3L22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>준비</button>
+</nav>
+
+<div id="lb" class="lb" hidden><div class="lbp">
+  <div class="lbh"><h3 id="lbt"></h3><button class="lbx" aria-label="닫기">✕</button></div>
+  <div id="lbb"></div>
+</div></div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════
+   사진 넣는 법 — 둘 중 편한 쪽
+
+   방법 1) 폴더에 파일만 넣기 (설정 불필요, 추천)
+     index.html 옆에 photos 폴더를 만들고 아래 id 로 파일명을 지으세요
+       photos/sagrada-1.jpg   photos/sagrada-2.jpg  …  -6 까지
+     jpg / jpeg / png / webp 모두 인식합니다
+
+   방법 2) 아래 PHOTOS 에 주소를 직접 적기 (외부 링크도 가능)
+       sagrada: ['photos/내사진.jpg', 'https://example.com/a.jpg'],
+   ═══════════════════════════════════════════════════════════════ */
+const PHOTOS = {
+  // sagrada: ['photos/sagrada-a.jpg'],
+};
+
+/* 숙소 — 정해지면 여기에 추가하면 지도에 보라색 핀으로 나옵니다 */
+const STAYS = [
+  // {city:'바르셀로나', name:'호텔 이름', lat:41.3874, lng:2.1686},
+];
+
+const LOC=[
+ {c:'바르셀로나',t:'air', id:'bcnair',q:'Barcelona El Prat Airport',n:'바르셀로나 엘프라트 공항',lat:41.29834,lng:2.08001},
+ {c:'바르셀로나',t:'rail',id:'sants',q:'Barcelona Sants railway station', n:'바르셀로나 산츠역',      lat:41.37896,lng:2.13983},
+ {c:'바르셀로나',t:'see', id:'sagrada',q:'Sagrada Familia Barcelona',n:'사그라다 파밀리아',      lat:41.40363,lng:2.17436},
+ {c:'바르셀로나',t:'see', id:'guell',q:'Park Guell Barcelona', n:'구엘 공원',              lat:41.41449,lng:2.15269},
+ {c:'바르셀로나',t:'see', id:'batllo',q:'Casa Batllo Barcelona',n:'카사 바트요',            lat:41.39170,lng:2.16492},
+ {c:'바르셀로나',t:'see', id:'palau',q:'Palau de la Musica Catalana', n:'팔라우 데 라 무지카',    lat:41.38758,lng:2.17531},
+ {c:'바르셀로나',t:'see', id:'santpau',q:'Hospital de Sant Pau Barcelona',n:'산 파우 병원',          lat:41.41550,lng:2.17473},
+ {c:'파리',      t:'rail',id:'lyon',q:'Gare de Lyon Paris',  n:'파리 리옹역',            lat:48.84430,lng:2.37438},
+ {c:'파리',      t:'see', id:'eiffel',q:'Eiffel Tower Paris',n:'에펠탑',                 lat:48.85837,lng:2.29448},
+ {c:'파리',      t:'see', id:'louvre',q:'Louvre Museum Paris',n:'루브르 박물관',          lat:48.86061,lng:2.33764},
+ {c:'파리',      t:'see', id:'orsay',q:'Musee d\'Orsay Paris', n:'오르세 미술관',          lat:48.85996,lng:2.32656},
+ {c:'파리',      t:'see', id:'versailles',q:'Palace of Versailles',n:'베르사유 궁전',      lat:48.80486,lng:2.12036},
+ {c:'파리',      t:'see', id:'sacre',q:'Sacre-Coeur Paris', n:'사크레쾨르 대성당',      lat:48.88670,lng:2.34310},
+ {c:'인터라켄',  t:'rail',id:'ilkost',q:'Interlaken Ost station',n:'인터라켄 오스트역',      lat:46.69043,lng:7.86905},
+ {c:'인터라켄',  t:'see', id:'jungfrau',q:'Jungfraujoch',n:'융프라우요흐',         lat:46.54746,lng:7.98211},
+ {c:'인터라켄',  t:'see', id:'first',q:'Grindelwald First', n:'그린델발트 피르스트',    lat:46.62513,lng:8.04178},
+ {c:'인터라켄',  t:'see', id:'lauter',q:'Lauterbrunnen Switzerland',n:'라우터브루넨',           lat:46.59351,lng:7.90910},
+ {c:'피렌체',    t:'rail',id:'smn',q:'Firenze Santa Maria Novella station',   n:'피렌체 SMN역',           lat:43.77667,lng:11.24792},
+ {c:'피렌체',    t:'see', id:'duomo',q:'Florence Cathedral duomo', n:'두오모',                 lat:43.77315,lng:11.25596},
+ {c:'피렌체',    t:'see', id:'uffizi',q:'Uffizi Gallery Florence',n:'우피치 미술관',          lat:43.76779,lng:11.25531},
+ {c:'피렌체',    t:'see', id:'accademia',q:'Galleria dell\'Accademia Florence',n:'아카데미아 미술관',   lat:43.77681,lng:11.25864},
+ {c:'피렌체',    t:'see', id:'vecchio',q:'Ponte Vecchio Florence',n:'베키오 다리',           lat:43.76793,lng:11.25314},
+ {c:'피렌체',    t:'see', id:'michelangelo',q:'Piazzale Michelangelo Florence',n:'미켈란젤로 광장',  lat:43.76293,lng:11.26506},
+ {c:'로마',      t:'rail',id:'termini',q:'Roma Termini station',n:'로마 테르미니역',       lat:41.90129,lng:12.50158},
+ {c:'로마',      t:'air', id:'fco',q:'Rome Fiumicino Airport',   n:'피우미치노 공항',        lat:41.80346,lng:12.25192},
+ {c:'로마',      t:'see', id:'vatican',q:'Vatican Museums',n:'바티칸 박물관',         lat:41.90649,lng:12.45364},
+ {c:'로마',      t:'see', id:'stpeter',q:'St Peter\'s Basilica Vatican',n:'성 베드로 대성당',      lat:41.90217,lng:12.45394},
+ {c:'로마',      t:'see', id:'colosseo',q:'Colosseum Rome',n:'콜로세움',             lat:41.89021,lng:12.49223},
+ {c:'로마',      t:'see', id:'trevi',q:'Trevi Fountain Rome', n:'트레비 분수',            lat:41.90093,lng:12.48331},
+ {c:'로마',      t:'see', id:'angelo',q:'Castel Sant\'Angelo Rome',n:'산탄젤로 성',            lat:41.90306,lng:12.46628}
+];
+
+/* 관광지 주요 정보 */
+const SINFO={
+ sagrada:'시간 지정 예약 필수. 탑 등반은 별도 요금',
+ batllo:'가우디 주택. 시간 지정 입장',
+ palau:'가이드투어로만 입장. 사전 예약 필수',
+ santpau:'모데르니스타 파빌리온. 관광객이 적어 한적',
+ guell:'시간 지정 입장. 언덕이라 도보 부담 있음',
+ eiffel:'트로카데로 쪽에서 전경 사진이 잘 나옴',
+ louvre:'화요일 휴관. 이날은 월요일이라 개관',
+ orsay:'월요일 휴관. 일요일에 배치',
+ versailles:'월요일 휴관. 반나절 소요',
+ sacre:'몽마르트르 언덕 위. 파리 시내 전망',
+ jungfrau:'아이거 익스프레스 편도 1시간 30분. 정상 약 -15도',
+ first:'융프라우가 흐릴 때의 대안',
+ lauter:'계곡 마을. 겨울에도 접근 가능',
+ duomo:'일요일 관광 입장 불가. 돔은 엘리베이터 없이 463계단',
+ uffizi:'월요일 휴관. 2~3시간 소요',
+ accademia:'월요일 휴관. 다비드 진품. 1시간이면 충분',
+ vecchio:'아르노강 14세기 다리. 해질녘 추천',
+ michelangelo:'도시 전경. 오르막이라 택시나 12·13번 버스 권장',
+ trevi:'야경 추천. 주변 소매치기 주의',
+ vatican:'일요일 휴관. 시간 지정 예약 필수. 대성당과 입구가 다름',
+ stpeter:'입장 무료. 쿠폴라는 엘리베이터 이후 320계단',
+ colosseo:'포로 로마노 통합권',
+ angelo:'월요일 휴관. 옥상에서 바티칸 전경',
+ sants:'바르셀로나 산츠역',lyon:'파리 리옹역',ilkost:'인터라켄 오스트역',
+ smn:'피렌체 SMN역',termini:'로마 테르미니역',fco:'피우미치노 공항',bcnair:'엘프라트 공항'
+};
+
+const DAYS=[
+ {d:'2/3',w:'수',c:'바르셀로나',t:'인천 출발 · 저녁 도착',
+  plan:'11:30 인천 T1에서 TW0407 출발, 14시간 55분 비행. 18:25 바르셀로나 엘프라트 T2 도착 후 호텔 체크인하고 휴식합니다.',
+  spots:[],note:['이동','첫날은 이동만 합니다. 시차 적응을 위해 무리하지 마세요.']},
+ {d:'2/4',w:'목',c:'바르셀로나',t:'가우디와 고딕지구',
+  plan:'오전 사그라다 파밀리아, 이어 카사 바트요. 오후에는 고딕지구를 걷고 보케리아 시장에서 타파스.',
+  spots:['sagrada','batllo'],note:['예약','사그라다 파밀리아는 시간 지정 예약이 필요합니다.']},
+ {d:'2/5',w:'금',c:'바르셀로나',t:'모데르니스메 건축',
+  plan:'오전 팔라우 데 라 무지카 가이드투어, 이어 산 파우 병원. 오후에는 구엘 공원 또는 몬주익 야경 중 한 곳.',
+  spots:['palau','santpau','guell'],note:['체력','오후는 한 곳만 고르세요. 산 파우는 북쪽, 구엘 공원은 더 북쪽 언덕, 몬주익은 남서쪽이라 두 곳을 붙이면 이동만으로 지칩니다.']},
+ {d:'2/6',w:'토',c:'이동',t:'바르셀로나 → 파리',
+  plan:'오전 산츠역에서 직행 TGV로 6시간 30분. 오후 파리 도착 후 에펠탑과 센강 유람선, 개선문.',
+  spots:['sants','eiffel'],note:['예약','직행 TGV는 하루 몇 편뿐이라 미리 예약해야 합니다.']},
+ {d:'2/7',w:'일',c:'파리',t:'베르사유와 오르세',
+  plan:'오전 베르사유 궁전 반나절. 오후 파리로 돌아와 오르세 미술관.',
+  spots:['versailles','orsay'],note:['혼잡','그달 첫 일요일이라 무료 개방일일 수 있습니다. 사람이 많을 수 있으니 시간 지정 예약을 권합니다. 설날이기도 합니다.']},
+ {d:'2/8',w:'월',c:'파리',t:'루브르와 몽마르트르',
+  plan:'오전 루브르 박물관. 오후 몽마르트르 언덕과 사크레쾨르 대성당.',
+  spots:['louvre','sacre'],note:['휴관','월요일이라 오르세와 베르사유가 쉽니다. 루브르는 화요일 휴관이라 오늘이 적기입니다.']},
+ {d:'2/9',w:'화',c:'이동',t:'파리 → 인터라켄',
+  plan:'오전 리옹역 출발, 바젤 환승으로 5시간 30분. 오후 도착 후 마을 산책과 툰 호숫가.',
+  spots:['lyon','ilkost'],note:['날씨','도착 후 다음 이틀의 산 정상 날씨를 확인해 융프라우 날짜를 정하세요.']},
+ {d:'2/10',w:'수',c:'인터라켄',t:'융프라우요흐',
+  plan:'아이거 익스프레스로 융프라우요흐. 편도 1시간 30분, 종일 일정입니다.',
+  spots:['jungfrau'],note:['날씨','흐리면 다음 날로 미루세요. 이틀 중 맑은 날을 고르라고 예비일을 뒀습니다.']},
+ {d:'2/11',w:'목',c:'인터라켄',t:'예비일',
+  plan:'전날 융프라우를 다녀왔다면 그린델발트 피르스트나 라우터브루넨 계곡. 날씨가 나빴다면 오늘 융프라우 재시도.',
+  spots:['first','lauter','jungfrau'],note:['운휴','하더쿨름과 쉬니게플라테는 겨울 운휴입니다.']},
+ {d:'2/12',w:'금',c:'이동',t:'인터라켄 → 피렌체',
+  plan:'밀라노 경유로 약 7시간, 종일 이동. 저녁 도착 후 두오모 야경과 베키오 다리 산책.',
+  spots:['smn','duomo','vecchio'],note:['이동','가장 긴 이동 구간입니다. 아침 일찍보다 여유 있게 출발하세요.']},
+ {d:'2/13',w:'토',c:'피렌체',t:'르네상스 하루',
+  plan:'오전 아카데미아에서 다비드, 이어 두오모 내부. 오후 우피치 미술관, 해질녘 미켈란젤로 광장.',
+  spots:['accademia','duomo','uffizi','michelangelo'],
+  note:['개관','토요일이라 우피치·아카데미아(월요일 휴관)와 두오모(일요일 입장 불가)가 모두 열립니다.']},
+ {d:'2/14',w:'일',c:'이동',t:'피렌체 → 로마',
+  plan:'오전 중앙시장과 가죽시장. 오후 고속열차로 1시간 30분. 저녁 로마 도착 후 트레비 분수와 판테온 야경.',
+  spots:['termini','trevi'],note:['휴관','오늘은 일요일이라 바티칸 박물관이 쉽니다. 내일로 배치했습니다.']},
+ {d:'2/15',w:'월',c:'로마',t:'바티칸',
+  plan:'바티칸 박물관과 시스티나 성당, 이어 성 베드로 대성당.',
+  spots:['vatican','stpeter'],note:['동선','박물관과 대성당은 입구가 달라 도보 10분을 돌아가야 합니다. 산탄젤로 성은 월요일 휴관이라 내일로 뒀습니다.']},
+ {d:'2/16',w:'화',c:'로마',t:'고대 로마 · 귀국',
+  plan:'오전 콜로세움과 포로 로마노, 이어 스페인 광장과 산탄젤로 성. 15:00쯤 시내를 떠나 공항으로 이동, 19:00 TW0406 출발.',
+  spots:['colosseo','angelo','fco'],note:['출발','19:00 출발이라 공항에 16:00까지 도착해야 합니다. 오전과 이른 오후만 쓸 수 있으니 짐은 호텔에 맡기고 다니세요.']},
+ {d:'2/17',w:'수',c:'도착',t:'인천 도착',
+  plan:'14:50 인천 T1 도착으로 13박 15일 일정이 끝납니다.',
+  spots:[],note:[]}
+];
+
+const TODOS=[
+ ['바르셀로나 → 파리 직행 TGV','2/6 토','하루 몇 편뿐이라 좌석이 일찍 찹니다. 가장 먼저 잡으세요.'],
+ ['바티칸 박물관','2/15 월','일요일 휴관이라 이 날짜로 고정. 시간 지정 예약 필요.'],
+ ['우피치 · 아카데미아 · 두오모','2/13 토','오전 아카데미아, 오후 우피치. 두오모 통합권도 같은 날.'],
+ ['파리 미술관','2/7 일 · 2/8 월','일요일 베르사유·오르세, 월요일 루브르. 첫 일요일 혼잡 주의.'],
+ ['사그라다 파밀리아','2/4 목','시간 지정 입장. 탑 등반은 별도 요금.'],
+ ['팔라우 데 라 무지카','2/5 금','가이드투어로만 입장. 오전 투어 권장.'],
+ ['융프라우요흐','2/10 수 또는 2/11 목','예보 좋은 날 선택. 당일 아침 정상 날씨 확인 후 구매.']
+];
+
+const ALL = LOC.concat(STAYS.map((s,i)=>({c:s.city,t:'stay',id:'stay'+i,n:s.name,lat:s.lat,lng:s.lng})));
+const byId = Object.fromEntries(ALL.map(l=>[l.id,l]));
+const EXT=['jpg','jpeg','png','webp'];
+/* 내 사진이 없을 때만 위키미디어 공용에서 자동으로 채웁니다. 끄려면 false */
+const USE_COMMONS=true;
+const _cc=new Map();
+function _strip(h){const d=document.createElement('div');d.innerHTML=h||'';return (d.textContent||'').trim();}
+async function commons(id,limit){
+  const L=byId[id];
+  if(!USE_COMMONS||!L||!L.q) return [];
+  const key=id+':'+limit;
+  if(_cc.has(key)) return _cc.get(key);
+  const url='https://commons.wikimedia.org/w/api.php?action=query&format=json&origin=*'
+    +'&generator=search&gsrnamespace=6&gsrlimit='+limit
+    +'&gsrsearch='+encodeURIComponent(L.q+' filetype:bitmap')
+    +'&prop=imageinfo&iiprop=url%7Cextmetadata&iiurlwidth=640';
+  let out=[];
+  try{
+    const r=await fetch(url); const d=await r.json();
+    const pg=(d.query&&d.query.pages)||{};
+    out=Object.keys(pg).map(k=>pg[k]).sort((a,b)=>a.index-b.index).map(x=>{
+      const ii=x.imageinfo&&x.imageinfo[0]; if(!ii||!ii.thumburl) return null;
+      const m=ii.extmetadata||{};
+      return {src:ii.thumburl,page:ii.descriptionurl,
+              by:_strip(m.Artist&&m.Artist.value)||'작자 미상',
+              lic:(m.LicenseShortName&&m.LicenseShortName.value)||''};
+    }).filter(Boolean).slice(0,limit);
+  }catch(e){ out=[]; }
+  _cc.set(key,out); return out;
+}
+
+const tok = s => s.replace(/\{(\w+)\}/g,(m,id)=>
+  byId[id] ? '<button class="spot" data-id="'+id+'">'+byId[id].n+'</button>' : m);
+
+const nowKey=(new Date().getMonth()+1)+'/'+new Date().getDate();
+function spotCard(id){
+  const L=byId[id]||{n:id};
+  return '<div class="scard" data-id="'+id+'"><div class="sph" data-ph="'+id+'">불러오는 중</div>'+
+         '<div class="sbody"><b>'+L.n+'</b><span>'+(SINFO[id]||'')+'</span></div></div>';
+}
+function renderDays(filter){
+  const list = filter&&filter!=='전체' ? DAYS.filter(d=>d.c===filter) : DAYS;
+  document.getElementById('days').innerHTML = list.map(d=>
+   '<div class="drow'+(d.d===nowKey?' today':'')+'">'+
+     '<div class="dhead"><span class="ddate">'+d.d+' '+d.w+'</span>'+
+       '<span class="dcity'+(d.c==='이동'?' move':'')+'">'+d.c+'</span>'+
+       '<span class="dtitle">'+d.t+'</span><span class="dcaret">▸</span></div>'+
+     '<div class="dbody"><p class="dplan">'+d.plan+'</p>'+
+       (d.note.length?'<div class="dnote"><b>'+d.note[0]+'</b><span>'+d.note[1]+'</span></div>':'')+
+       (d.spots.length?'<div class="scards">'+d.spots.map(spotCard).join('')+'</div>':'')+
+     '</div></div>').join('');
+  document.querySelectorAll('.dhead').forEach(h=>h.addEventListener('click',()=>{
+    const r=h.parentElement; r.classList.toggle('open');
+    if(r.classList.contains('open')) r.querySelectorAll('.sph').forEach(fillThumb);
+  }));
+}
+async function fillThumb(el){
+  if(el.dataset.done) return; el.dataset.done='1';
+  const id=el.dataset.ph, src=await firstPhoto(id);
+  if(src) el.outerHTML='<img class="sthumb" src="'+src+'" alt="" loading="lazy">';
+}
+async function firstPhoto(id){
+  if(PHOTOS[id]&&PHOTOS[id].length) return PHOTOS[id][0];
+  for(const e of EXT){ const hit=await probe('photos/'+id+'-1.'+e); if(hit) return hit; }
+  const c=await commons(id,1);
+  return c.length?c[0].src:null;
+}
+const DCHIPS=['전체','바르셀로나','파리','인터라켄','피렌체','로마','이동'];
+document.getElementById('daychips').innerHTML=DCHIPS.map((c,i)=>
+  '<button class="chip'+(i===0?' on':'')+'" data-d="'+c+'">'+c+'</button>').join('');
+document.querySelectorAll('#daychips .chip').forEach(ch=>ch.addEventListener('click',()=>{
+  document.querySelectorAll('#daychips .chip').forEach(x=>x.classList.remove('on'));
+  ch.classList.add('on'); renderDays(ch.dataset.d);
+}));
+renderDays('전체');
+document.querySelectorAll('.drow.today .dhead').forEach(h=>h.click());
+
+const lb=document.getElementById('lb'),lbt=document.getElementById('lbt'),lbb=document.getElementById('lbb');
+function probe(src){return new Promise(r=>{const i=new Image();i.onload=()=>r(src);i.onerror=()=>r(null);i.src=src;});}
+async function collect(id){
+  if(PHOTOS[id]&&PHOTOS[id].length) return PHOTOS[id];
+  const out=[];
+  for(let n=1;n<=6;n++){
+    let hit=null;
+    for(const e of EXT){ hit=await probe('photos/'+id+'-'+n+'.'+e); if(hit) break; }
+    if(!hit) break;
+    out.push(hit);
+  }
+  return out;
+}
+function acts(L){
+  return '<div class="pact"><a href="https://www.google.com/maps/dir/?api=1&destination='+L.lat+','+L.lng+
+         '" target="_blank" rel="noopener">길찾기</a><button class="gomap" data-id="'+L.id+'">앱 지도에서 보기</button></div>';
+}
+async function openSpot(id){
+  const L=byId[id]; if(!L) return;
+  lbt.textContent=L.n; lb.hidden=false; document.body.style.overflow='hidden';
+  lbb.innerHTML=acts(L)+'<p class="pempty">사진 불러오는 중…</p>';
+  let imgs=await collect(id), credit='';
+  if(!imgs.length){
+    const c=await commons(id,6);
+    imgs=c.map(x=>x.src);
+    if(c.length) credit='<p class="pempty" style="font-size:11.5px">사진 출처 · 위키미디어 공용 — '
+      + c.slice(0,3).map(x=>'<a href="'+x.page+'" target="_blank" rel="noopener" style="color:var(--deep)">'
+      + x.by.slice(0,18) + (x.lic?' ('+x.lic+')':'') + '</a>').join(', ')
+      + ' 외. <code>photos</code> 폴더에 <code>'+id+'-1.jpg</code> 를 넣으면 내 사진으로 바뀝니다.</p>';
+  }
+  lbb.innerHTML=acts(L)+(imgs.length
+    ? '<div class="pgrid">'+imgs.map(s=>'<img src="'+s+'" alt="" loading="lazy">').join('')+'</div>'+credit
+    : '<p class="pempty">사진을 찾지 못했습니다. <code>photos</code> 폴더에 <code>'+id+'-1.jpg</code> 로 저장하면 표시됩니다.</p>');
+}
+function closeLb(){lb.hidden=true;lbb.innerHTML='';document.body.style.overflow='';}
+document.addEventListener('click',e=>{
+  const sm=e.target.closest('.smap');
+  if(sm){ lbt.textContent=sm.alt; lbb.innerHTML='<img src="'+sm.src+'" alt="" style="width:100%;border-radius:8px;margin-top:14px;background:#fff">';
+          lb.hidden=false; document.body.style.overflow='hidden'; return; }
+  const g=e.target.closest('.gomap');
+  if(g){const id=g.dataset.id;closeLb();showTab('map');focusOn(id);return;}
+  const b=e.target.closest('.spot'); if(b){openSpot(b.dataset.id);return;}
+  if(e.target===lb||e.target.closest('.lbx')) closeLb();
+});
+document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!lb.hidden)closeLb();});
+
+let saved={}; try{saved=JSON.parse(localStorage.getItem('trip27')||'{}');}catch(e){}
+document.getElementById('todos').innerHTML=TODOS.map((t,i)=>
+'<div class="chk'+(saved[i]?' done':'')+'" data-i="'+i+'"><span class="box">✓</span>'+
+'<span class="ctext"><b>'+t[0]+'</b><span class="cwhen">'+t[1]+'</span>'+t[2]+'</span></div>').join('');
+document.querySelectorAll('.chk').forEach(el=>el.addEventListener('click',()=>{
+  el.classList.toggle('done'); saved[el.dataset.i]=el.classList.contains('done');
+  try{localStorage.setItem('trip27',JSON.stringify(saved));}catch(e){}
+}));
+
+function showTab(t){
+  document.querySelectorAll('nav button').forEach(x=>x.classList.toggle('on',x.dataset.t===t));
+  document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on',x.id==='p-'+t));
+  window.scrollTo({top:0});
+  if(t==='map'&&map) setTimeout(()=>map.invalidateSize(),120);
+}
+document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.t)));
+
+const today=new Date(),dep=new Date(2027,1,3);
+const diff=Math.ceil((dep-today)/86400000);
+document.getElementById('count').innerHTML=
+ (diff>0?'출발까지 D-'+diff+'<br>':diff===0?'오늘 출발<br>':'여행 중<br>')+'2027.02.03 → 02.17';
+
+let map=null, marks={};
+const CITY_NAMES=['전체','바르셀로나','파리','인터라켄','피렌체','로마'];
+function fit(city){
+  const set = city==='전체' ? ALL : ALL.filter(l=>l.c===city);
+  if(!set.length||!map) return;
+  map.fitBounds(set.map(l=>[l.lat,l.lng]),{padding:[45,45],maxZoom:14});
+}
+function focusOn(id){
+  const l=byId[id]; if(!l||!map) return;
+  setTimeout(()=>{map.invalidateSize();map.setView([l.lat,l.lng],15);if(marks[id])marks[id].openPopup();},220);
+}
+window.addEventListener('load',()=>{
+  if(typeof L==='undefined'){
+    document.getElementById('map').outerHTML='<p class="tip">지도를 불러오지 못했습니다. 인터넷 연결을 확인해 주세요.</p>';return;}
+  const dark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+  map=L.map('map',{scrollWheelZoom:false});
+  // 기본 타일이 막히면 OpenStreetMap 기본 서버로 자동 전환
+  let tileErr=0, swapped=false;
+  let layer=L.tileLayer('https://{s}.basemaps.cartocdn.com/'+(dark?'dark_all':'light_all')+'/{z}/{x}/{y}{r}.png',
+    {maxZoom:19,attribution:'&copy; OpenStreetMap &copy; CARTO'}).addTo(map);
+  layer.on('tileerror',()=>{
+    if(swapped) return;
+    if(++tileErr>=4){
+      swapped=true; map.removeLayer(layer);
+      layer=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+        {maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+      const n=document.getElementById('tilenote'); if(n) n.hidden=false;
+    }
+  });
+  const ICON={air:'✈',rail:'🚉',see:'★',stay:'🛏'};
+  ALL.forEach(l=>{
+    const m=L.marker([l.lat,l.lng],{icon:L.divIcon({className:'',
+      html:'<div class="pin '+l.t+'">'+(ICON[l.t]||'★')+'</div>',iconSize:[26,26],iconAnchor:[13,13]}),title:l.n}).addTo(map);
+    m.bindPopup('<b>'+l.n+'</b><a href="https://www.google.com/maps/dir/?api=1&destination='+l.lat+','+l.lng+
+      '" target="_blank" rel="noopener">길찾기</a><button class="spot" data-id="'+l.id+'">사진</button>');
+    marks[l.id]=m;
+  });
+  document.getElementById('chips').innerHTML=CITY_NAMES.map((c,i)=>
+    '<button class="chip'+(i===0?' on':'')+'" data-c="'+c+'">'+c+'</button>').join('');
+  document.querySelectorAll('.chip').forEach(ch=>ch.addEventListener('click',()=>{
+    document.querySelectorAll('.chip').forEach(x=>x.classList.remove('on'));
+    ch.classList.add('on'); fit(ch.dataset.c);
+  }));
+  fit('전체');
+  setTimeout(()=>map.invalidateSize(),250);
+  window.addEventListener('resize',()=>map.invalidateSize());
+});
+</script>
+</body>
 </html>

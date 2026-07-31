@@ -1,35 +1,46 @@
-# 서유럽 2027 여행 페이지 배포 안내
+# 서유럽 가족여행 2027
 
-`app.html`은 서버나 데이터베이스 없이 동작하는 단일 정적 웹페이지입니다. `index.html`은 GitHub Pages 시작 주소를 `app.html`로 연결합니다.
+부모님과 함께하는 서유럽 13박 15일(2027-02-03 ~ 02-17) 일정 앱.
 
-## 가장 쉬운 공유 방법: GitHub Pages
+**주소 → https://jkkms.github.io/west-europe-2027/**
 
-1. GitHub에서 새 **Public** 저장소를 만듭니다. 예: `west-europe-2027`
-2. 이 폴더의 `app.html`을 저장소 최상위에 올린 뒤 이름을 `index.html`로 바꿉니다.
-3. 저장소의 **Settings → Pages**에서 `Deploy from a branch`와 `main / (root)`를 선택해 저장합니다.
-4. 잠시 뒤 표시되는 `https://사용자이름.github.io/west-europe-2027/` 주소를 공유합니다.
+## 파일
 
-## 장소·항공편 자료를 추가하는 법
-
-배포된 페이지에서 해당 도시 카드를 열거나 항공편 카드를 확인한 뒤, **나의 자료 → 링크·사진**을 누릅니다.
-
-- 도시별 입장권·맛집·지도·사진, 출국·귀국 항공편별 좌석도·예약 페이지를 그 위치에 바로 붙일 수 있습니다.
-- 표시 방식을 **링크** 또는 **사진**으로 고릅니다.
-- 자료는 현재 기기에 저장됩니다.
-
-중요: 사진 파일을 컴퓨터에서 직접 고르는 방식은 다른 사람이 볼 수 없습니다. 사진은 Google Photos 공유 앨범, iCloud 공유 앨범, Imgur 등에서 **공개 이미지 URL**을 만든 뒤 넣어야 합니다. 모든 사람이 체크 상태·자료를 즉시 같이 보려면 Firebase 또는 Supabase 같은 공동 데이터 저장소를 연결해야 합니다.
-
-## Git으로 올리기 (선택)
-
-저장소를 만든 뒤 이 폴더에서 실행합니다.
-
-```sh
-git init
-git add app.html README.md
-git commit -m "Publish West Europe 2027 travel plan"
-git branch -M main
-git remote add origin https://github.com/사용자이름/west-europe-2027.git
-git push -u origin main
+```
+index.html      단일 파일 앱. HTML·CSS·JS 전부 내장
+app.html        옛 주소. index.html 로 넘겨주기만 함 (이미 공유한 링크용)
+photos/         관광지 사진. {아이디}-{1~6}.jpg|jpeg|png|webp
+seats/          항공 좌석 배치도
+CLAUDE.md       인수인계 문서 — 확정 사실, 설계 근거, 재구축 사양
 ```
 
-그 다음 위 GitHub Pages 단계를 진행하면 됩니다.
+GitHub Pages(`main` / root)로 배포됩니다. `index.html`을 고쳐서 push하면 1~2분 뒤 반영됩니다.
+
+## 화면
+
+| 탭 | 내용 |
+|---|---|
+| 일정 | 2/3~2/17 날짜별. 누르면 그날 계획·주의사항·관광지 카드가 펼쳐짐. 도시 필터 |
+| 지도 | 실제 지도 위에 공항·기차역·관광지·숙소 핀. 핀을 누르면 사진·길찾기 |
+| 항공 | 편명·시각·터미널·좌석·배치도 |
+| 준비 | 예약 체크리스트. 체크는 그 기기에만 저장 |
+
+## 사진 넣는 법
+
+`photos/` 폴더에 아래 이름으로 파일을 넣고 push하면 끝입니다. 앱 안에 업로드 기능은 없습니다.
+
+```
+photos/sagrada-1.jpg   photos/sagrada-2.jpg   …   -6 까지
+```
+
+아이디 목록은 [photos/README.txt](photos/README.txt)에 있습니다. 내 사진이 없는 곳은
+위키미디어 공용에서 자동으로 채우고 저작자·라이선스를 표기합니다
+(`index.html`의 `USE_COMMONS=false`로 끌 수 있음).
+
+## 아직 안 정해진 것
+
+1. **숙소 전 도시 미정** — `index.html`의 `STAYS` 배열에 `{city, name, lat, lng}`를 넣으면 지도에 보라색 핀으로 표시됩니다.
+2. **바르셀로나 → 파리 직행 TGV 미예약** — 편수가 적어 최우선.
+3. 2/7이 그달 첫 일요일이라 루브르·베르사유 무료 개방일일 수 있음. 혼잡 주의.
+
+고치기 전에 [CLAUDE.md](CLAUDE.md)의 "확정 사실"과 "주의 — 과거에 실제로 터진 버그"를 먼저 읽으세요.
