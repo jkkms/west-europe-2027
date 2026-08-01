@@ -48,21 +48,24 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .dcity{font-size:11px;font-family:var(--mono);color:#fff;background:var(--alpine);border-radius:99px;padding:2px 9px;flex:0 0 auto}
 .dcity.move{background:var(--moss)}
 .dtitle{flex:1;font-size:14px;line-height:1.5;color:var(--slate)}
-.dcaret{color:var(--slate);font-size:12px;transition:transform .2s;flex:0 0 auto}
-.drow.open .dcaret{transform:rotate(90deg)}
+.dcaret{flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+        width:30px;height:30px;border-radius:50%;background:var(--soft);color:var(--alpine);
+        transition:transform .2s,background-color .15s,color .15s}
+.dcaret svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
+.drow.open .dcaret{transform:rotate(90deg);background:var(--alpine);color:#fff}
 .drow.today{border-color:var(--alpine);border-width:2px}
 .dbody{display:none;padding:0 15px 15px;border-top:1px solid var(--frost)}
 .drow.open .dbody{display:block}
 .dplan{font-size:14.5px;line-height:1.75;padding:13px 0 0}
 .dnote{display:flex;gap:10px;margin-top:12px;padding:10px 12px;background:var(--emberbg);border-left:3px solid var(--ember);border-radius:0 6px 6px 0;font-size:13px;line-height:1.6}
 .dnote b{font-family:var(--mono);font-size:10px;color:var(--ember);flex:0 0 auto;padding-top:2px}
-.scards{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
+.scards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:14px}
 .scard{background:var(--soft);border-radius:10px;overflow:hidden;border:1px solid var(--frost)}
-.sthumb{width:100%;aspect-ratio:4/3;object-fit:cover;display:block;background:var(--soft)}
-.sph{width:100%;aspect-ratio:4/3;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10.5px;color:var(--slate);background:var(--soft)}
-.sbody{padding:8px 10px 10px}
-.sbody b{display:block;font-size:13px;font-weight:500;line-height:1.35}
-.sbody span{display:block;font-size:11.5px;color:var(--slate);line-height:1.5;margin-top:3px}
+.sthumb{width:100%;aspect-ratio:3/2;object-fit:cover;display:block;background:var(--soft)}
+.sph{width:100%;aspect-ratio:3/2;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10.5px;color:var(--slate);background:var(--soft)}
+.sbody{padding:11px 13px 13px}
+.sbody b{display:block;font-size:15px;font-weight:500;line-height:1.35}
+.sbody span{display:block;font-size:12.5px;color:var(--slate);line-height:1.55;margin-top:4px}
 .chips{display:flex;gap:6px;overflow-x:auto;padding:0 0 12px}
 .chip{flex:0 0 auto;font-family:var(--mono);font-size:12px;padding:6px 13px;border-radius:99px;border:1px solid var(--frost);background:var(--card);color:var(--slate);cursor:pointer}
 .chip.on{background:var(--alpine);border-color:var(--alpine);color:#fff}
@@ -75,13 +78,28 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .leaflet-popup-content a,.leaflet-popup-content button{font-family:var(--mono);font-size:12px;color:var(--alpine);text-decoration:none;background:none;border:0;padding:0;cursor:pointer;margin-right:10px}
 .mlegend{display:flex;flex-wrap:wrap;gap:10px 16px;padding:12px 2px 0;font-family:var(--mono);font-size:11.5px;color:var(--slate)}
 .mlegend i{display:inline-block;width:10px;height:10px;border-radius:50%;border:2.5px solid;margin-right:5px;vertical-align:-1px}
+.gbtn{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;padding:12px;
+      background:var(--card);border:1px solid var(--frost);border-radius:10px;
+      color:var(--deep);text-decoration:none;font-size:13.5px}
+.gbtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.gbtn:hover{border-color:var(--alpine);color:var(--alpine)}
 .fcard{background:var(--card);border:1px solid var(--frost);border-radius:12px;padding:16px;margin-bottom:12px}
 .frow{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--soft);font-size:14px}
 .frow:last-child{border-bottom:0}
 .frow span:first-child{color:var(--slate);font-size:13px}
 .frow span:last-child{font-family:var(--mono);font-size:13px;text-align:right}
 .seats{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.smap{width:100%;height:auto;margin-top:14px;border:1px solid var(--frost);border-radius:8px;display:block;cursor:zoom-in;background:#fff}
+.seatbox{margin-top:13px;border:1px solid var(--frost);border-radius:9px;overflow:hidden}
+.seatbox summary{display:flex;align-items:center;gap:8px;padding:10px 13px;cursor:pointer;
+                 list-style:none;background:var(--soft);color:var(--deep);
+                 font-family:var(--mono);font-size:12.5px}
+.seatbox summary::-webkit-details-marker{display:none}
+.seatbox summary::after{content:"▾";margin-left:auto;font-size:13px;color:var(--slate);transition:transform .2s}
+.seatbox[open] summary::after{transform:rotate(180deg)}
+.seatbox summary:hover{color:var(--alpine)}
+.smapcap{font-size:11.5px;color:var(--slate);text-align:center;margin:0 0 12px;padding:0 12px}
+.smap{display:block;width:auto;height:auto;max-width:100%;max-height:48vh;
+      margin:12px auto 8px;border:1px solid var(--frost);border-radius:6px;cursor:zoom-in;background:#fff}
 .seat{font-family:var(--mono);font-size:12px;background:var(--ember);color:#fff;border-radius:6px;padding:4px 10px}
 .chk{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--frost);cursor:pointer}
 .chk:last-child{border-bottom:0}
@@ -108,7 +126,7 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
 .pempty code{font-family:var(--mono);font-size:11.5px;background:var(--soft);padding:1px 5px;border-radius:4px}
 .pact{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
 .pact a,.pact button{font-family:var(--mono);font-size:12px;color:var(--deep);text-decoration:none;border:1px solid var(--frost);border-radius:99px;padding:6px 13px;background:var(--card);cursor:pointer}
-.smapbtn{display:block;width:100%;padding:0;background:none;border:0;cursor:zoom-in}
+.smapbtn{display:block;width:100%;padding:0;background:none;border:0;cursor:zoom-in;font:inherit}
 
 /* ── 키보드 초점 ── */
 :focus-visible{outline:2px solid var(--alpine);outline-offset:2px;border-radius:4px}
@@ -131,7 +149,8 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
 @media (min-width:700px) and (max-width:899px){
   .app{max-width:660px}
   #map{height:480px}
-  .pgrid,.scards{grid-template-columns:repeat(3,1fr)}
+  .pgrid{grid-template-columns:repeat(3,1fr)}
+  .scards{grid-template-columns:repeat(2,1fr)}
 }
 /* ── 데스크톱: 하단 탭 → 상단 탭, 본문 확장 ── */
 @media (min-width:900px){
@@ -156,7 +175,7 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
   .spot:hover{background:var(--soft)}
   .chip:hover{border-color:var(--alpine)}
   .pgrid{grid-template-columns:repeat(3,1fr)}
-  .scards{grid-template-columns:repeat(4,1fr)}
+  .scards{grid-template-columns:repeat(3,1fr)}
   .ddate{flex:0 0 70px}
   .lb{align-items:center;padding:32px}
   .lbp{border-radius:14px;max-width:720px;max-height:84vh;padding:22px 24px 26px}
@@ -192,8 +211,11 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
     <span><i style="border-color:var(--alpine)"></i>관광지</span>
     <span><i style="border-color:var(--plum)"></i>숙소</span>
   </div>
+  <a class="gbtn" id="gmapcity" href="https://www.google.com/maps" target="_blank" rel="noopener">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+    <span>구글 지도에서 이 지역 열기</span></a>
   <p class="tip" id="tilenote" hidden>기본 지도 서버에 연결하지 못해 OpenStreetMap 기본 지도로 전환했습니다. 위치와 기능은 동일합니다.</p>
-  <p class="tip">핀을 누르면 사진과 길찾기 링크가 나옵니다. <b>숙소는 아직 비어 있습니다.</b> 파일 안의 <code>STAYS</code> 목록에 이름과 좌표를 넣으면 보라색 핀으로 표시됩니다.</p>
+  <p class="tip">핀을 누르면 <b>구글 지도</b>·길찾기·사진이 나옵니다. 휴대폰에 구글 지도 앱이 있으면 앱으로 열립니다. <b>숙소는 아직 비어 있습니다.</b> 파일 안의 <code>STAYS</code> 목록에 이름과 좌표를 넣으면 보라색 핀으로 표시됩니다.</p>
 </section>
 
 <section class="panel" id="p-fly" role="tabpanel" aria-labelledby="t-fly">
@@ -207,7 +229,11 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
     <div class="frow"><span>소요</span><span>14시간 55분 · 직항</span></div>
     <div class="frow"><span>좌석</span><span>이코노미 3-4-3</span></div>
     <div class="seats"><i class="seat">39H</i><i class="seat">39K</i><i class="seat">40J</i><i class="seat">40K</i></div>
-    <button type="button" class="smapbtn"><img class="smap" src="seats/tw407-outbound.jpg" alt="TW0407 좌석 배치도 — 누르면 확대" width="764" height="1088"></button>
+    <details class="seatbox">
+      <summary>좌석 배치도 보기</summary>
+      <button type="button" class="smapbtn"><img class="smap" src="seats/tw407-outbound.jpg" alt="TW0407 좌석 배치도 — 누르면 확대" width="764" height="1088"></button>
+      <p class="smapcap">누르면 크게 볼 수 있습니다</p>
+    </details>
   </div>
 
   <div class="fcard">
@@ -218,7 +244,11 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
     <div class="frow"><span>소요</span><span>11시간 50분 · 직항</span></div>
     <div class="frow"><span>좌석</span><span>프리미엄 이코노미 2-4-2</span></div>
     <div class="seats"><i class="seat">7G</i><i class="seat">7H</i><i class="seat">8G</i><i class="seat">8H</i></div>
-    <button type="button" class="smapbtn"><img class="smap" src="seats/tw406-return.jpg" alt="TW0406 좌석 배치도 — 누르면 확대" width="712" height="1088"></button>
+    <details class="seatbox">
+      <summary>좌석 배치도 보기</summary>
+      <button type="button" class="smapbtn"><img class="smap" src="seats/tw406-return.jpg" alt="TW0406 좌석 배치도 — 누르면 확대" width="712" height="1088"></button>
+      <p class="smapcap">누르면 크게 볼 수 있습니다</p>
+    </details>
   </div>
 
   <div class="note"><b>출발일</b><span>2/16 로마 출발이 19:00이므로 공항에 16:00까지는 도착해야 합니다. 시내에서 15:00쯤 출발한다고 보고 그날 일정을 짜세요.</span></div>
@@ -437,7 +467,8 @@ function renderDays(filter){
      '<button type="button" class="dhead" aria-expanded="false" aria-controls="db'+i+'">'+
        '<span class="ddate">'+d.d+' '+d.w+'</span>'+
        '<span class="dcity'+(d.c==='이동'?' move':'')+'">'+d.c+'</span>'+
-       '<span class="dtitle">'+d.t+'</span><span class="dcaret" aria-hidden="true">▸</span></button>'+
+       '<span class="dtitle">'+d.t+'</span>'+
+       '<span class="dcaret" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></button>'+
      '<div class="dbody" id="db'+i+'"><p class="dplan">'+d.plan+'</p>'+
        (d.note.length?'<div class="dnote"><b>'+d.note[0]+'</b><span>'+d.note[1]+'</span></div>':'')+
        (d.spots.length?'<div class="scards">'+d.spots.map(spotCard).join('')+'</div>':'')+
@@ -497,9 +528,18 @@ async function _collectRaw(id){
   }
   return out;
 }
+/* 구글 지도 바로가기 — 공식 URL 규격(api=1). 앱이 깔려 있으면 앱으로 열린다. */
+const gDir   = L => 'https://www.google.com/maps/dir/?api=1&destination='+L.lat+','+L.lng;
+const gPlace = L => 'https://www.google.com/maps/search/?api=1&query='+
+                    encodeURIComponent(L.q || (L.lat+','+L.lng));
+const gArea  = (lat,lng,z) => 'https://www.google.com/maps/@?api=1&map_action=map&center='+
+                    lat+','+lng+'&zoom='+z;
+
 function acts(L){
-  return '<div class="pact"><a href="https://www.google.com/maps/dir/?api=1&destination='+L.lat+','+L.lng+
-         '" target="_blank" rel="noopener">길찾기</a><button type="button" class="gomap" data-id="'+L.id+'">앱 지도에서 보기</button></div>';
+  return '<div class="pact">'+
+         '<a href="'+gPlace(L)+'" target="_blank" rel="noopener">구글지도에서 보기</a>'+
+         '<a href="'+gDir(L)+'" target="_blank" rel="noopener">길찾기</a>'+
+         '<button type="button" class="gomap" data-id="'+L.id+'">앱 지도에서 보기</button></div>';
 }
 let lastFocus=null;
 function openLb(title){
@@ -579,7 +619,17 @@ let map=null, marks={};
 const CITY_NAMES=['전체','바르셀로나','파리','인터라켄','피렌체','로마'];
 function fit(city){
   const set = city==='전체' ? ALL : ALL.filter(l=>l.c===city);
-  if(!set.length||!map) return;
+  if(!set.length) return;
+  /* 고른 도시를 구글 지도에서 바로 열 수 있게 버튼 주소를 맞춰 둔다 */
+  const g=document.getElementById('gmapcity');
+  if(g){
+    const lat=set.reduce((s,l)=>s+l.lat,0)/set.length,
+          lng=set.reduce((s,l)=>s+l.lng,0)/set.length;
+    g.href=gArea(lat,lng,city==='전체'?5:12);
+    g.querySelector('span').textContent=
+      city==='전체' ? '구글 지도에서 여행 지역 열기' : '구글 지도에서 '+city+' 열기';
+  }
+  if(!map) return;
   map.fitBounds(set.map(l=>[l.lat,l.lng]),{padding:[45,45],maxZoom:14});
 }
 function focusOn(id){
@@ -620,8 +670,10 @@ window.addEventListener('load',()=>{
   ALL.forEach(l=>{
     const m=L.marker([l.lat,l.lng],{icon:L.divIcon({className:'',
       html:'<div class="pin '+l.t+'">'+(ICON[l.t]||'★')+'</div>',iconSize:[26,26],iconAnchor:[13,13]}),title:l.n}).addTo(map);
-    m.bindPopup('<b>'+l.n+'</b><a href="https://www.google.com/maps/dir/?api=1&destination='+l.lat+','+l.lng+
-      '" target="_blank" rel="noopener">길찾기</a><button type="button" class="spot" data-id="'+l.id+'">사진</button>');
+    m.bindPopup('<b>'+l.n+'</b>'+
+      '<a href="'+gPlace(l)+'" target="_blank" rel="noopener">구글지도</a>'+
+      '<a href="'+gDir(l)+'" target="_blank" rel="noopener">길찾기</a>'+
+      '<button type="button" class="spot" data-id="'+l.id+'">사진</button>');
     marks[l.id]=m;
   });
   document.getElementById('chips').innerHTML=CITY_NAMES.map((c,i)=>
