@@ -21,13 +21,15 @@
 :root{
   --ink:#16202b;--slate:#5a6b7a;--paper:#eef1f4;--card:#fff;--frost:#d5dee5;--soft:#e6ebef;
   --alpine:#2e6e8e;--deep:#1d4f68;--ember:#b64f2b;--emberbg:#f6ece7;--moss:#4a7a5e;--plum:#7c5cbf;
+  --mossbg:#e9f0eb;
   --sans:'IBM Plex Sans KR',system-ui,sans-serif;
   --mono:'IBM Plex Mono','IBM Plex Sans KR',monospace;
   --serif:'Gowun Batang',serif;--nav:64px;
 }
 @media (prefers-color-scheme:dark){:root{
   --ink:#e8edf1;--slate:#9aa9b6;--paper:#111a22;--card:#18232d;--frost:#2b3945;--soft:#223039;
-  --alpine:#6aa9c6;--deep:#8fc3da;--ember:#d97a52;--emberbg:#2a1e18;--moss:#7fb094;--plum:#a58ae0;}}
+  --alpine:#6aa9c6;--deep:#8fc3da;--ember:#d97a52;--emberbg:#2a1e18;--moss:#7fb094;--plum:#a58ae0;
+  --mossbg:#1b2620;}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
 body{margin:0;background:var(--paper);color:var(--ink);font-family:var(--sans);font-weight:300;font-size:15px;line-height:1.7}
 .app{max-width:520px;margin:0 auto;padding:0 16px calc(var(--nav) + env(safe-area-inset-bottom) + 24px)}
@@ -59,6 +61,12 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .dplan{font-size:14.5px;line-height:1.75;padding:13px 0 0}
 .dnote{display:flex;gap:10px;margin-top:12px;padding:10px 12px;background:var(--emberbg);border-left:3px solid var(--ember);border-radius:0 6px 6px 0;font-size:13px;line-height:1.6}
 .dnote b{font-family:var(--mono);font-size:10px;color:var(--ember);flex:0 0 auto;padding-top:2px}
+.dopt{margin-top:10px;padding:11px 13px;background:var(--mossbg);border-left:3px solid var(--moss);
+      border-radius:0 6px 6px 0;font-size:13px;line-height:1.65}
+.dopt b{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--moss);margin-bottom:5px}
+.dopt ul{margin:0;padding-left:17px}
+.dopt li{margin:4px 0}
+.dopt li::marker{color:var(--moss)}
 .scards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:14px}
 .scard{background:var(--soft);border-radius:10px;overflow:hidden;border:1px solid var(--frost)}
 .sthumb{width:100%;aspect-ratio:3/2;object-fit:cover;display:block;background:var(--soft)}
@@ -314,7 +322,6 @@ const LOC=[
  {c:'파리',      t:'see', id:'eiffel',q:'Eiffel Tower Paris',n:'에펠탑',                 lat:48.85837,lng:2.29448},
  {c:'파리',      t:'see', id:'louvre',q:'Louvre Museum Paris',n:'루브르 박물관',          lat:48.86061,lng:2.33764},
  {c:'파리',      t:'see', id:'orsay',q:'Musee d\'Orsay Paris', n:'오르세 미술관',          lat:48.85996,lng:2.32656},
- {c:'파리',      t:'see', id:'versailles',q:'Palace of Versailles',n:'베르사유 궁전',      lat:48.80486,lng:2.12036},
  {c:'파리',      t:'see', id:'sacre',q:'Sacre-Coeur Paris', n:'사크레쾨르 대성당',      lat:48.88670,lng:2.34310},
  {c:'인터라켄',  t:'rail',id:'ilkost',q:'Interlaken Ost station',n:'인터라켄 오스트역',      lat:46.69043,lng:7.86905},
  {c:'인터라켄',  t:'see', id:'jungfrau',q:'Jungfraujoch',n:'융프라우요흐',         lat:46.54746,lng:7.98211},
@@ -345,14 +352,13 @@ const SINFO={
  eiffel:'트로카데로 쪽에서 전경 사진이 잘 나옴',
  louvre:'화요일 휴관. 이날은 월요일이라 개관',
  orsay:'월요일 휴관. 일요일에 배치',
- versailles:'월요일 휴관. 반나절 소요',
  sacre:'몽마르트르 언덕 위. 파리 시내 전망',
  jungfrau:'아이거 익스프레스 편도 1시간 30분. 정상 약 -15도',
  first:'융프라우가 흐릴 때의 대안',
  lauter:'계곡 마을. 겨울에도 접근 가능',
  duomo:'일요일 관광 입장 불가. 돔은 엘리베이터 없이 463계단',
  uffizi:'월요일 휴관. 2~3시간 소요',
- accademia:'월요일 휴관. 다비드 진품. 1시간이면 충분',
+ accademia:'월요일 휴관. 다비드 진품. 1시간이면 충분. 2/13 여유 옵션',
  vecchio:'아르노강 14세기 다리. 해질녘 추천',
  michelangelo:'도시 전경. 오르막이라 택시나 12·13번 버스 권장',
  trevi:'야경 추천. 주변 소매치기 주의',
@@ -360,29 +366,40 @@ const SINFO={
  stpeter:'입장 무료. 쿠폴라는 엘리베이터 이후 320계단',
  colosseo:'포로 로마노 통합권',
  angelo:'월요일 휴관. 옥상에서 바티칸 전경',
- sants:'바르셀로나 산츠역',lyon:'파리 리옹역',ilkost:'인터라켄 오스트역',
- smn:'피렌체 SMN역',termini:'로마 테르미니역',fco:'피우미치노 공항',bcnair:'엘프라트 공항'
+ sants:'바르셀로나 중앙역. 파리행 직행 TGV가 여기서 출발',
+ lyon:'파리 동남부 방면 출발역. 스위스행도 여기서',
+ ilkost:'인터라켄 동쪽 역. 융프라우 방면 산악열차 출발',
+ smn:'피렌체 중앙역. 두오모까지 도보 10분대',
+ termini:'로마 중앙역. 공항 직통열차도 여기서',
+ fco:'로마 국제공항. 테르미니역까지 직통열차 연결',
+ bcnair:'바르셀로나 국제공항. 시내까지 공항버스·지하철 연결'
 };
 
+/* opt = 여유 옵션. 시간이 남을 때만 가는 곳이라 확정 일정과 구분해 표시한다. */
 const DAYS=[
  {d:'2/3',w:'수',c:'바르셀로나',t:'인천 출발 · 저녁 도착',
   plan:'11:30 인천 T1에서 TW0407 출발, 14시간 55분 비행. 18:25 바르셀로나 엘프라트 T2 도착 후 호텔 체크인하고 휴식합니다.',
   spots:[],note:['이동','첫날은 이동만 합니다. 시차 적응을 위해 무리하지 마세요.']},
  {d:'2/4',w:'목',c:'바르셀로나',t:'가우디와 고딕지구',
-  plan:'오전 사그라다 파밀리아, 이어 카사 바트요. 오후에는 고딕지구를 걷고 보케리아 시장에서 타파스.',
-  spots:['sagrada','batllo'],note:['예약','사그라다 파밀리아는 시간 지정 예약이 필요합니다.']},
+  plan:'사그라다 파밀리아 → 카사 바트요 내부 관람 → 고딕지구 산책.',
+  spots:['sagrada','batllo'],note:['예약','사그라다 파밀리아와 카사 바트요 모두 시간 지정 예약이 필요합니다.'],
+  opt:['보케리아 시장 — 고딕지구에서 도보권. 일요일에는 문을 닫으니 목요일인 오늘이 적기입니다']},
  {d:'2/5',w:'금',c:'바르셀로나',t:'모데르니스메 건축',
-  plan:'오전 팔라우 데 라 무지카 가이드투어, 이어 산 파우 병원. 오후에는 구엘 공원 또는 몬주익 야경 중 한 곳.',
-  spots:['palau','santpau','guell'],note:['체력','오후는 한 곳만 고르세요. 산 파우는 북쪽, 구엘 공원은 더 북쪽 언덕, 몬주익은 남서쪽이라 두 곳을 붙이면 이동만으로 지칩니다.']},
+  plan:'팔라우 데 라 무지카 가이드투어 → 산 파우 병원. 오후에는 구엘 공원 또는 몬주익 야경 중 한 곳.',
+  spots:['palau','santpau','guell'],note:['체력','오후는 한 곳만 고르세요. 산 파우는 북쪽, 구엘 공원은 더 북쪽 언덕, 몬주익은 남서쪽이라 두 곳을 붙이면 이동만으로 지칩니다.'],
+  opt:['오후에 고르지 않은 나머지 한 곳','카사 밀라(라 페드레라) 외관 — 카사 바트요에서 그라시아 거리를 따라 도보 10분']},
  {d:'2/6',w:'토',c:'이동',t:'바르셀로나 → 파리',
-  plan:'오전 산츠역에서 직행 TGV로 6시간 30분. 오후 파리 도착 후 에펠탑과 센강 유람선, 개선문.',
-  spots:['sants','eiffel'],note:['예약','직행 TGV는 하루 몇 편뿐이라 미리 예약해야 합니다.']},
- {d:'2/7',w:'일',c:'파리',t:'베르사유와 오르세',
-  plan:'오전 베르사유 궁전 반나절. 오후 파리로 돌아와 오르세 미술관.',
-  spots:['versailles','orsay'],note:['혼잡','그달 첫 일요일이라 무료 개방일일 수 있습니다. 사람이 많을 수 있으니 시간 지정 예약을 권합니다. 설날이기도 합니다.']},
+  plan:'09:26 산츠역 출발, 직행 TGV로 16:12 파리 리옹역 도착. 6시간 46분이 걸립니다. 체크인하고 휴식합니다.',
+  spots:['sants','lyon'],note:['예약','직행 TGV는 하루 몇 편뿐이라 미리 예약해야 합니다.'],
+  opt:['트로카데로에서 에펠탑 야간 조명 — 매시 정각에 5분간 반짝입니다']},
+ {d:'2/7',w:'일',c:'파리',t:'오르세와 에펠탑',
+  plan:'오전 오르세 미술관 → 오후 마레지구 또는 생제르맹 산책 → 저녁 에펠탑 전망대 → 센강 유람선.',
+  spots:['orsay','eiffel'],note:['혼잡','그달 첫 일요일이라 오르세가 무료 개방일일 수 있습니다. 사람이 많을 수 있으니 시간 지정 예약을 권합니다. 설날이기도 합니다.'],
+  opt:['오랑주리 미술관 — 오르세에서 도보 15분. 모네 수련. 화요일 휴관이라 오늘은 열립니다']},
  {d:'2/8',w:'월',c:'파리',t:'루브르와 몽마르트르',
-  plan:'오전 루브르 박물관. 오후 몽마르트르 언덕과 사크레쾨르 대성당.',
-  spots:['louvre','sacre'],note:['휴관','월요일이라 오르세와 베르사유가 쉽니다. 루브르는 화요일 휴관이라 오늘이 적기입니다.']},
+  plan:'오전 루브르 박물관 → 샹젤리제 거리 → 개선문 → 몽마르트르 언덕과 사크레쾨르 대성당.',
+  spots:['louvre','sacre'],note:['휴관','월요일이라 오르세가 쉽니다. 루브르는 화요일 휴관이라 오늘이 적기입니다.'],
+  opt:['생트샤펠 — 스테인드글라스 예배당. 30분이면 충분합니다']},
  {d:'2/9',w:'화',c:'이동',t:'파리 → 인터라켄',
   plan:'오전 리옹역 출발, 바젤 환승으로 5시간 30분. 오후 도착 후 마을 산책과 툰 호숫가.',
   spots:['lyon','ilkost'],note:['날씨','도착 후 다음 이틀의 산 정상 날씨를 확인해 융프라우 날짜를 정하세요.']},
@@ -390,35 +407,40 @@ const DAYS=[
   plan:'아이거 익스프레스로 융프라우요흐. 편도 1시간 30분, 종일 일정입니다.',
   spots:['jungfrau'],note:['날씨','흐리면 다음 날로 미루세요. 이틀 중 맑은 날을 고르라고 예비일을 뒀습니다.']},
  {d:'2/11',w:'목',c:'인터라켄',t:'예비일',
-  plan:'전날 융프라우를 다녀왔다면 그린델발트 피르스트나 라우터브루넨 계곡. 날씨가 나빴다면 오늘 융프라우 재시도.',
+  plan:'그린델발트 피르스트 또는 라우터브루넨 계곡. 전날 융프라우를 못 갔다면 오늘 재시도합니다.',
   spots:['first','lauter','jungfrau'],note:['운휴','하더쿨름과 쉬니게플라테는 겨울 운휴입니다.']},
  {d:'2/12',w:'금',c:'이동',t:'인터라켄 → 피렌체',
-  plan:'밀라노 경유로 약 7시간, 종일 이동. 저녁 도착 후 두오모 야경과 베키오 다리 산책.',
-  spots:['smn','duomo','vecchio'],note:['이동','가장 긴 이동 구간입니다. 아침 일찍보다 여유 있게 출발하세요.']},
+  plan:'밀라노 경유로 약 7시간, 종일 이동. 도착 후 휴식합니다.',
+  spots:['smn'],note:['이동','가장 긴 이동 구간입니다. 아침 일찍보다 여유 있게 출발하세요.'],
+  opt:['두오모 야경과 베키오 다리 산책 — 숙소가 두오모 근처일 때만']},
  {d:'2/13',w:'토',c:'피렌체',t:'르네상스 하루',
-  plan:'오전 아카데미아에서 다비드, 이어 두오모 내부. 오후 우피치 미술관, 해질녘 미켈란젤로 광장.',
-  spots:['accademia','duomo','uffizi','michelangelo'],
-  note:['개관','토요일이라 우피치·아카데미아(월요일 휴관)와 두오모(일요일 입장 불가)가 모두 열립니다.']},
+  plan:'오전 우피치 미술관 → 두오모 내부 → 해질녘 미켈란젤로 광장.',
+  spots:['uffizi','duomo','michelangelo'],
+  note:['개관','토요일이라 우피치(월요일 휴관)와 두오모(일요일 관광 입장 불가)가 모두 열립니다.'],
+  opt:['아카데미아 미술관 — 다비드 진품. 우피치를 오전에 일찍 끝냈다면 갈 수 있습니다','베키오 다리 — 우피치 바로 옆이라 지나가며 보게 될 가능성이 높습니다','시뇨리아 광장']},
  {d:'2/14',w:'일',c:'이동',t:'피렌체 → 로마',
-  plan:'오전 중앙시장과 가죽시장. 오후 고속열차로 1시간 30분. 저녁 로마 도착 후 트레비 분수와 판테온 야경.',
-  spots:['termini','trevi'],note:['휴관','오늘은 일요일이라 바티칸 박물관이 쉽니다. 내일로 배치했습니다.']},
+  plan:'오전 여유 → 고속열차로 1시간 30분 → 저녁 로마 도착 후 트레비 분수와 판테온 야경.',
+  spots:['termini','trevi'],note:['휴관','오늘은 일요일이라 바티칸 박물관이 쉽니다. 내일로 배치했습니다.'],
+  opt:['중앙시장과 산 로렌초 가죽시장 — 오전 출발 전에. 다만 일요일이라 중앙시장은 문을 닫을 수 있으니 미리 확인하세요']},
  {d:'2/15',w:'월',c:'로마',t:'바티칸',
-  plan:'바티칸 박물관과 시스티나 성당, 이어 성 베드로 대성당.',
-  spots:['vatican','stpeter'],note:['동선','박물관과 대성당은 입구가 달라 도보 10분을 돌아가야 합니다. 산탄젤로 성은 월요일 휴관이라 내일로 뒀습니다.']},
+  plan:'바티칸 박물관 → 시스티나 성당 → 성 베드로 대성당.',
+  spots:['vatican','stpeter'],note:['동선','박물관과 대성당은 입구가 달라 도보 10분을 돌아가야 합니다. 산탄젤로 성은 월요일 휴관이라 오늘은 못 가고 내일로 뒀습니다.']},
  {d:'2/16',w:'화',c:'로마',t:'고대 로마 · 귀국',
-  plan:'오전 콜로세움과 포로 로마노, 이어 스페인 광장과 산탄젤로 성. 15:00쯤 시내를 떠나 공항으로 이동, 19:00 TW0406 출발.',
-  spots:['colosseo','angelo','fco'],note:['출발','19:00 출발이라 공항에 16:00까지 도착해야 합니다. 오전과 이른 오후만 쓸 수 있으니 짐은 호텔에 맡기고 다니세요.']},
+  plan:'오전 콜로세움과 포로 로마노 → 15:00쯤 시내 출발 → 19:00 피우미치노 T3에서 TW0406 출발.',
+  spots:['colosseo','fco'],note:['출발','19:00 출발이라 공항에 16:00까지 도착해야 합니다. 오전과 이른 오후만 쓸 수 있으니 짐은 호텔에 맡기고 다니세요.'],
+  opt:['산탄젤로 성 또는 스페인 광장 — 오전이 예상보다 빨리 끝났을 때만. 방향이 반대라 둘 중 하나만 고르세요','콜로세움과 포로 로마노가 예상보다 오래 걸리면 옵션은 포기하고 공항으로 향하세요']},
  {d:'2/17',w:'수',c:'도착',t:'인천 도착',
   plan:'14:50 인천 T1 도착으로 13박 15일 일정이 끝납니다.',
   spots:[],note:[]}
 ];
 
 const TODOS=[
- ['바르셀로나 → 파리 직행 TGV','2/6 토','하루 몇 편뿐이라 좌석이 일찍 찹니다. 가장 먼저 잡으세요.'],
+ ['바르셀로나 → 파리 직행 TGV','2/6 토','09:26 출발 16:12 도착. 하루 몇 편뿐이라 좌석이 일찍 찹니다. 가장 먼저 잡으세요.'],
  ['바티칸 박물관','2/15 월','일요일 휴관이라 이 날짜로 고정. 시간 지정 예약 필요.'],
- ['우피치 · 아카데미아 · 두오모','2/13 토','오전 아카데미아, 오후 우피치. 두오모 통합권도 같은 날.'],
- ['파리 미술관','2/7 일 · 2/8 월','일요일 베르사유·오르세, 월요일 루브르. 첫 일요일 혼잡 주의.'],
- ['사그라다 파밀리아','2/4 목','시간 지정 입장. 탑 등반은 별도 요금.'],
+ ['우피치 미술관 · 두오모','2/13 토','오전 우피치, 이어 두오모 통합권. 아카데미아는 시간이 남을 때만.'],
+ ['오르세 · 루브르','2/7 일 · 2/8 월','일요일 오르세, 월요일 루브르. 첫 일요일이라 오르세 혼잡 주의.'],
+ ['에펠탑 전망대','2/7 일','저녁 시간대는 일찍 찹니다. 시간 지정 예약 권장.'],
+ ['사그라다 파밀리아 · 카사 바트요','2/4 목','둘 다 시간 지정 입장. 사그라다 탑 등반은 별도 요금.'],
  ['팔라우 데 라 무지카','2/5 금','가이드투어로만 입장. 오전 투어 권장.'],
  ['융프라우요흐','2/10 수 또는 2/11 목','예보 좋은 날 선택. 당일 아침 정상 날씨 확인 후 구매.']
 ];
@@ -471,6 +493,8 @@ function renderDays(filter){
        '<span class="dcaret" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></button>'+
      '<div class="dbody" id="db'+i+'"><p class="dplan">'+d.plan+'</p>'+
        (d.note.length?'<div class="dnote"><b>'+d.note[0]+'</b><span>'+d.note[1]+'</span></div>':'')+
+       (d.opt&&d.opt.length?'<div class="dopt"><b>여유 옵션</b><ul>'+
+          d.opt.map(o=>'<li>'+o+'</li>').join('')+'</ul></div>':'')+
        (d.spots.length?'<div class="scards">'+d.spots.map(spotCard).join('')+'</div>':'')+
      '</div></div>').join('');
   document.querySelectorAll('.dhead').forEach(h=>h.addEventListener('click',()=>{
