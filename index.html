@@ -112,13 +112,13 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .seat{font-family:var(--mono);font-size:12px;background:var(--ember);color:#fff;border-radius:6px;padding:4px 10px}
 /* ── 예약 체크리스트 표 ── */
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
-.btab{width:100%;border-collapse:collapse;background:var(--card);
+.btab{width:100%;table-layout:fixed;border-collapse:collapse;background:var(--card);
       border:1px solid var(--frost);border-radius:12px;overflow:hidden}
 .btab thead th{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--slate);
       text-transform:uppercase;font-weight:400;text-align:left;padding:10px 8px;
       background:var(--soft);border-bottom:1px solid var(--frost)}
-.btab .c1{width:38px}
-.btab .c2{width:126px}
+.btab .c1{width:32px}
+.btab .c2{width:150px}
 .btab td{padding:11px 8px;border-bottom:1px solid var(--soft);vertical-align:top}
 .btab tr:last-child td{border-bottom:0}
 .bchk{text-align:center}
@@ -128,16 +128,18 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .bwhen{font-family:var(--mono);font-size:11.5px;color:var(--alpine);line-height:1.6;white-space:nowrap}
 .bwhen .wd{color:var(--slate)}
 .brow.anytime .bwhen{color:var(--slate)}
-.guess{font-style:normal;display:inline-block;margin-top:3px;font-size:9.5px;padding:1px 5px;
-       border-radius:99px;background:var(--emberbg);color:var(--ember)}
+.guess{font-style:normal;display:block;width:fit-content;margin-top:4px;font-size:9.5px;
+       padding:1px 6px;border-radius:99px;background:var(--emberbg);color:var(--ember)}
 .bname{display:flex;align-items:center;gap:9px;width:100%;font:inherit;font-size:14px;
        font-weight:500;color:inherit;text-align:left;background:none;border:0;padding:0;
        cursor:pointer;line-height:1.4}
 .bname .caret{margin-left:auto}
 .brow.done .bname{color:var(--slate);text-decoration:line-through}
-.csite{display:inline-block;margin-top:6px;font-family:var(--mono);font-size:11px;
-       color:var(--deep);text-decoration:none;border:1px solid var(--frost);
-       border-radius:99px;padding:3px 9px}
+.csite{display:inline-flex;align-items:center;gap:5px;max-width:100%;margin-top:6px;
+       font-family:var(--mono);font-size:11px;color:var(--deep);text-decoration:none;
+       border:1px solid var(--frost);border-radius:99px;padding:3px 9px}
+.cst{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
+.csite .arw{display:none}
 .csite:hover{border-color:var(--alpine);color:var(--alpine)}
 .bdet td{font-size:13px;line-height:1.7;color:var(--slate);background:var(--soft);
          padding:12px 14px 14px 46px;border-bottom:1px solid var(--frost)}
@@ -220,9 +222,12 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
   /* 이름 칸이 남는 폭을 다 먹어야 화살표가 항목마다 같은 자리에 선다 */
   .bitem .bname{flex:1 1 auto;min-width:0}
   /* 예매처를 고정폭 열로 세워야 링크도 화살표도 세로로 줄이 맞는다 */
-  .csite{margin-top:0;flex:0 0 auto;min-width:212px;text-align:center}
+  .csite{margin-top:0;flex:0 0 auto;min-width:178px;justify-content:center}
+  .csite .arw{display:inline}
   .btab td{padding:13px 10px}
-  .btab .c2{width:156px}
+  .btab .c2{width:200px}
+  /* 넓어진 폭을 쓰도록 추정 배지를 날짜와 같은 줄에 */
+  .guess{display:inline-block;margin:0 0 0 7px;vertical-align:1px}
   .bdet td{padding-left:58px}
 }
 /* ── 넓은 화면: 지도 탭은 더 크게 ── */
@@ -699,11 +704,16 @@ document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!lb.hidden)closeLb(
    저장 범위는 이 기기뿐이다 — 가족끼리 공유하려면 바깥 저장소가 필요하다. */
 let saved={}; try{saved=JSON.parse(localStorage.getItem('trip27todo')||'{}');}catch(e){}
 const WD='일월화수목금토';
+/* 화면에는 핵심 도메인만 보여준다. ticket./tickets./billetterie. 같은 예매용
+   서브도메인을 떼면 좁은 화면에서도 잘리지 않고, 진짜 가짜를 가리는 데 필요한
+   부분(등록 도메인)은 그대로 남는다. 링크 주소 자체는 손대지 않는다. */
+const shortSite = n =>
+  n.replace(/^(tickets?|ticketing|billetterie|entrades|www)\./,'');
 function whenCell(t){
   if(!t.open) return '상시';
   const [y,m,d]=t.open.split('-').map(Number);
   return t.open+' <span class="wd">('+WD[new Date(y,m-1,d).getDay()]+')</span>'
-       + (t.sure?'':'<br><i class="guess">추정</i>');
+       + (t.sure?'':'<i class="guess">추정</i>');
 }
 /* 예약이 빨리 열리는 것부터. 상시 항목은 뒤로 */
 const TSORT=TODOS.slice().sort((a,b)=>
@@ -718,7 +728,8 @@ document.getElementById('todos').innerHTML=TSORT.map(t=>
        '<span>'+t.t+'</span>'+
        '<span class="caret" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span>'+
      '</button>'+
-     '<a class="csite" href="'+t.url+'" target="_blank" rel="noopener">'+t.site+' ↗</a>'+
+     '<a class="csite" href="'+t.url+'" target="_blank" rel="noopener">'+
+       '<span class="cst">'+shortSite(t.site)+'</span><span class="arw" aria-hidden="true">↗</span></a>'+
    '</td>'+
  '</tr>'+
  '<tr class="bdet" id="det-'+t.id+'" hidden><td colspan="3">'+t.d+'</td></tr>').join('');
