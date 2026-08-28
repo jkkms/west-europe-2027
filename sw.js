@@ -9,11 +9,12 @@
  *
  * VERSION 을 올리면 이미 앱을 연 적 있는 기기에 "새 버전이 준비됐습니다" 알림이 뜬다.
  */
-const VERSION = 'v1';
+const VERSION = 'v2';
 const SHELL   = 'shell-' + VERSION;   // 앱 본체. 버전이 바뀌면 통째로 새로 받음
 const ASSET   = 'asset-' + VERSION;   // 폰트·Leaflet 등 바뀌지 않는 외부 파일
 const PHOTO   = 'photo-1';            // 사진. 버전과 무관하게 유지
-const TILE    = 'tile-1';             // 지도 타일. 본 곳만 남음
+const TILE    = 'tile-2';             // 지도 타일. 본 곳만 남음
+                                      // v1 에는 워터마크 박힌 CARTO 타일이 들어 있어 버렸다
 
 const PHOTO_MAX = 120;
 const TILE_MAX  = 400;
@@ -96,7 +97,7 @@ self.addEventListener('fetch', e => {
   }
 
   /* 지도 타일 — 본 곳만 남겨 두면 현지에서 데이터 없이도 대충 보인다 */
-  if (host.endsWith('basemaps.cartocdn.com') || host === 'tile.openstreetmap.org') {
+  if (host === 'tile.openstreetmap.org' || host === 'services.arcgisonline.com') {
     e.respondWith(cacheFirst(req, TILE, TILE_MAX).catch(() => caches.match(req)));
     return;
   }

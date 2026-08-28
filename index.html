@@ -83,6 +83,8 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .pin{width:26px;height:26px;border-radius:50%;background:var(--card);border:2.5px solid var(--alpine);display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 1px 4px rgba(22,32,43,.3)}
 .pin.air{border-color:var(--ember)}.pin.rail{border-color:var(--moss)}.pin.stay{border-color:var(--plum)}
 .leaflet-container{font-family:var(--sans)}
+/* 어두운 테마용. .leaflet-tile-pane 에만 걸어야 핀·팝업이 같이 반전되지 않는다. */
+#map.nightmap .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.65)}
 .leaflet-popup-content{margin:11px 13px;font-size:14px}
 .leaflet-popup-content b{font-family:var(--serif);font-size:15px;display:block;margin-bottom:5px}
 .leaflet-popup-content a,.leaflet-popup-content button{font-family:var(--mono);font-size:12px;color:var(--alpine);text-decoration:none;background:none;border:0;padding:0;cursor:pointer;margin-right:10px}
@@ -261,7 +263,7 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
   <a class="gbtn" id="gmapcity" href="https://www.google.com/maps" target="_blank" rel="noopener">
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
     <span>구글 지도에서 이 지역 열기</span></a>
-  <p class="tip" id="tilenote" hidden>기본 지도 서버에 연결하지 못해 OpenStreetMap 기본 지도로 전환했습니다. 위치와 기능은 동일합니다.</p>
+  <p class="tip" id="tilenote" hidden>기본 지도 서버에 연결하지 못해 예비 지도로 전환했습니다. 라벨이 조금 적지만 위치와 기능은 동일합니다.</p>
   <p class="tip">핀을 누르면 <b>구글 지도</b>·길찾기·사진이 나옵니다. 휴대폰에 구글 지도 앱이 있으면 앱으로 열립니다. <b>숙소는 아직 비어 있습니다.</b> 파일 안의 <code>STAYS</code> 목록에 이름과 좌표를 넣으면 보라색 핀으로 표시됩니다.</p>
 </section>
 
@@ -754,7 +756,11 @@ function showTab(t){
   });
   document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on',x.id==='p-'+t));
   window.scrollTo({top:0});
-  if(t==='map'&&map) setTimeout(()=>map.invalidateSize(),120);
+  if(t==='map'&&map) setTimeout(()=>{
+    map.invalidateSize();
+    /* 크기가 잡힌 뒤 한 번만 다시 맞춘다. 매번 하면 사용자가 옮겨 둔 화면이 튄다. */
+    if(!mapFitted){ mapFitted=true; fit(curCity); }
+  },120);
 }
 document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.t)));
 
@@ -764,8 +770,13 @@ document.getElementById('count').innerHTML=
  (diff>0?'출발까지 D-'+diff+'<br>':diff===0?'오늘 출발<br>':'여행 중<br>')+'2027.02.03 → 02.17';
 
 let map=null, marks={};
+/* 지도는 숨은 탭에서 만들어진다. 그 상태의 컨테이너 크기는 0 이라 fitBounds 가
+   말도 안 되는 줌을 계산하고 maxZoom 에 걸려 14 로 굳는다(실제로 "전체"인데
+   이탈리아 시골이 확대돼 보였다). 그래서 지도가 처음 화면에 나올 때 한 번 더 맞춘다. */
+let curCity='전체', mapFitted=false;
 const CITY_NAMES=['전체','바르셀로나','파리','인터라켄','피렌체','로마'];
 function fit(city){
+  curCity=city;
   const set = city==='전체' ? ALL : ALL.filter(l=>l.c===city);
   if(!set.length) return;
   /* 고른 도시를 구글 지도에서 바로 열 수 있게 버튼 주소를 맞춰 둔다 */
@@ -790,30 +801,35 @@ window.addEventListener('load',()=>{
   const darkQ=window.matchMedia('(prefers-color-scheme: dark)');
   // 마우스 휠 확대는 데스크톱에서만. 모바일에서는 페이지 스크롤을 가로채므로 끈다.
   map=L.map('map',{scrollWheelZoom:window.matchMedia('(min-width:900px)').matches});
-  // 기본 타일이 막히면 OpenStreetMap 기본 서버로 자동 전환
-  let tileErr=0, swapped=false, layer=null;
-  function carto(){
-    return L.tileLayer('https://{s}.basemaps.cartocdn.com/'+(darkQ.matches?'dark_all':'light_all')+'/{z}/{x}/{y}{r}.png',
-      {maxZoom:19,attribution:'&copy; OpenStreetMap &copy; CARTO'});
-  }
-  function onTileErr(){
+
+  /* 타일 공급자
+     CARTO 는 API 키를 요구하게 바뀌어 타일마다 "API KEY REQUIRED" 워터마크가 찍힌다.
+     오류가 아니라 200 으로 정상 응답하므로 tileerror 폴백으로는 걸러지지 않는다.
+     키가 필요 없고 도로명·랜드마크 라벨이 충실한 OSM 표준으로 갈아탔다.
+     Esri 회색 지도도 후보였지만 라벨이 거의 없어 길을 찾는 데 못 쓴다. */
+  let layer=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
+    {maxZoom:19,attribution:'&copy; OpenStreetMap contributors'}).addTo(map);
+
+  /* OSM 이 막히면 Esri 회색 지도로 넘어간다. 라벨은 별도 레이어라 같이 얹는다. */
+  let tileErr=0, swapped=false;
+  layer.on('tileerror',()=>{
     if(swapped) return;
-    if(++tileErr>=4){
+    if(++tileErr>=6){
       swapped=true; map.removeLayer(layer);
-      layer=L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png',
-        {maxZoom:19,attribution:'&copy; OpenStreetMap'}).addTo(map);
+      const E='https://services.arcgisonline.com/ArcGIS/rest/services/Canvas/';
+      layer=L.tileLayer(E+'World_Light_Gray_Base/MapServer/tile/{z}/{y}/{x}',
+        {maxZoom:16,attribution:'Tiles &copy; Esri'}).addTo(map);
+      L.tileLayer(E+'World_Light_Gray_Reference/MapServer/tile/{z}/{y}/{x}',{maxZoom:16}).addTo(map);
       const n=document.getElementById('tilenote'); if(n) n.hidden=false;
     }
-  }
-  layer=carto().addTo(map); layer.on('tileerror',onTileErr);
-  // 기기 테마가 바뀌면 밝은/어두운 지도로 따라 바꾼다
-  const onTheme=()=>{
-    if(swapped) return;
-    map.removeLayer(layer);
-    layer=carto().addTo(map); layer.on('tileerror',onTileErr);
-  };
-  if(darkQ.addEventListener) darkQ.addEventListener('change',onTheme);
-  else if(darkQ.addListener) darkQ.addListener(onTheme);
+  });
+
+  /* 어두운 테마에서는 타일 레이어만 반전시킨다. 핀과 팝업은 다른 pane 이라 그대로다. */
+  const paintTheme=()=>document.getElementById('map').classList.toggle('nightmap',darkQ.matches);
+  paintTheme();
+  if(darkQ.addEventListener) darkQ.addEventListener('change',paintTheme);
+  else if(darkQ.addListener) darkQ.addListener(paintTheme);
+
   const ICON={air:'✈',rail:'🚉',see:'★',stay:'🛏'};
   ALL.forEach(l=>{
     const m=L.marker([l.lat,l.lng],{icon:L.divIcon({className:'',
@@ -835,7 +851,12 @@ window.addEventListener('load',()=>{
     ch.classList.add('on'); ch.setAttribute('aria-pressed','true'); fit(ch.dataset.c);
   }));
   fit('전체');
-  setTimeout(()=>map.invalidateSize(),250);
+  setTimeout(()=>{
+    map.invalidateSize();
+    if(!mapFitted && document.getElementById('p-map').classList.contains('on')){
+      mapFitted=true; fit(curCity);
+    }
+  },250);
   window.addEventListener('resize',()=>map.invalidateSize());
 });
 
