@@ -109,21 +109,37 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .smap{display:block;width:auto;height:auto;max-width:100%;max-height:48vh;
       margin:12px auto 8px;border:1px solid var(--frost);border-radius:6px;cursor:zoom-in;background:#fff}
 .seat{font-family:var(--mono);font-size:12px;background:var(--ember);color:#fff;border-radius:6px;padding:4px 10px}
-.chk{display:flex;gap:12px;padding:13px 0;border-bottom:1px solid var(--frost);cursor:pointer}
-.chk:last-child{border-bottom:0}
-.box{flex:0 0 20px;height:20px;border:1.5px solid var(--frost);border-radius:5px;margin-top:2px;display:flex;align-items:center;justify-content:center;font-size:12px;color:#fff}
-.chk.done .box{background:var(--alpine);border-color:var(--alpine)}
-.chk.done .ctext{color:var(--slate);text-decoration:line-through}
-.ctext{flex:1;font-size:14px}.ctext b{font-weight:500}
-.cwhen{font-family:var(--mono);font-size:11.5px;color:var(--alpine);display:block;margin:3px 0 5px}
-.cwhen.anytime{color:var(--slate)}
-.cwhen .guess{font-style:normal;font-size:10px;margin-left:6px;padding:1px 6px;border-radius:99px;
-              background:var(--emberbg);color:var(--ember);vertical-align:1px}
-.cdesc{display:block}
-.csite{display:inline-block;margin-top:10px;font-family:var(--mono);font-size:11.5px;
+/* ── 예약 체크리스트 표 ── */
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
+.btab{width:100%;border-collapse:collapse;background:var(--card);
+      border:1px solid var(--frost);border-radius:12px;overflow:hidden}
+.btab thead th{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--slate);
+      text-transform:uppercase;font-weight:400;text-align:left;padding:10px 8px;
+      background:var(--soft);border-bottom:1px solid var(--frost)}
+.btab .c1{width:38px}
+.btab .c2{width:96px}
+.btab td{padding:11px 8px;border-bottom:1px solid var(--soft);vertical-align:top}
+.btab tr:last-child td{border-bottom:0}
+.bchk{text-align:center}
+.box{width:22px;height:22px;border:1.5px solid var(--frost);border-radius:6px;background:none;
+     color:transparent;font-size:13px;cursor:pointer;padding:0;line-height:1;display:block;margin:1px auto}
+.brow.done .box{background:var(--alpine);border-color:var(--alpine);color:#fff}
+.bwhen{font-family:var(--mono);font-size:11.5px;color:var(--alpine);line-height:1.5}
+.bwhen .wd{color:var(--slate)}
+.brow.anytime .bwhen{color:var(--slate)}
+.guess{font-style:normal;display:inline-block;margin-top:3px;font-size:9.5px;padding:1px 5px;
+       border-radius:99px;background:var(--emberbg);color:var(--ember)}
+.bname{display:block;font:inherit;font-size:14px;font-weight:500;color:inherit;text-align:left;
+       background:none;border:0;padding:0;cursor:pointer;line-height:1.4}
+.bname::after{content:" ▾";font-size:10px;color:var(--slate)}
+.brow.open .bname::after{content:" ▴"}
+.brow.done .bname{color:var(--slate);text-decoration:line-through}
+.csite{display:inline-block;margin-top:6px;font-family:var(--mono);font-size:11px;
        color:var(--deep);text-decoration:none;border:1px solid var(--frost);
-       border-radius:99px;padding:4px 11px;background:var(--card)}
+       border-radius:99px;padding:3px 9px}
 .csite:hover{border-color:var(--alpine);color:var(--alpine)}
+.bdet td{font-size:13px;line-height:1.7;color:var(--slate);background:var(--soft);
+         padding:12px 14px 14px 46px;border-bottom:1px solid var(--frost)}
 nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);border-top:1px solid var(--frost);display:flex;padding-bottom:env(safe-area-inset-bottom)}
 nav button{flex:1;background:none;border:0;padding:9px 0 8px;font-family:var(--sans);font-size:10.5px;color:var(--slate);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
 nav button.on{color:var(--alpine);font-weight:500}
@@ -146,7 +162,7 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
 
 /* ── 키보드 초점 ── */
 :focus-visible{outline:2px solid var(--alpine);outline-offset:2px;border-radius:4px}
-.dhead:focus-visible,.chk:focus-visible{outline-offset:-2px}
+.dhead:focus-visible{outline-offset:-2px}
 
 /* ── 새 버전 알림 ── */
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav) + env(safe-area-inset-bottom) + 14px);
@@ -198,6 +214,12 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
   .fcard{max-width:none}
   .tip{font-size:13.5px}
   .toast{bottom:24px}
+  /* 넓은 화면에서는 항목 이름과 예매처를 한 줄에 */
+  .bitem{display:flex;align-items:center;justify-content:space-between;gap:20px}
+  .csite{margin-top:0;flex:0 0 auto}
+  .btab td{padding:13px 10px}
+  .btab .c2{width:120px}
+  .bdet td{padding-left:58px}
 }
 /* ── 넓은 화면: 지도 탭은 더 크게 ── */
 @media (min-width:1280px){
@@ -276,8 +298,15 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
 
 <section class="panel" id="p-todo" role="tabpanel" aria-labelledby="t-todo">
   <p class="eyebrow">Before you go</p><h2>예약 체크리스트</h2>
-  <div id="todos"></div>
-  <p class="tip">예약이 빨리 열리는 것부터 정렬했습니다. <b>날짜에 <span style="color:var(--ember)">추정</span>이 붙은 것은 확정 공지가 아니라 "60일 전"처럼 공개된 규칙으로 계산한 값</b>이니 그 무렵 사이트에서 직접 확인하세요.</p>
+  <table class="btab">
+    <thead><tr>
+      <th class="c1"><span class="sr">완료</span></th>
+      <th class="c2">예약 시작</th>
+      <th class="c3">항목 · 예매처</th>
+    </tr></thead>
+    <tbody id="todos"></tbody>
+  </table>
+  <p class="tip">항목 이름을 누르면 자세한 설명이 열립니다. 예약이 빨리 열리는 것부터 정렬했습니다. <b>날짜에 <span style="color:var(--ember)">추정</span>이 붙은 것은 확정 공지가 아니라 "60일 전"처럼 공개된 규칙으로 계산한 값</b>이니 그 무렵 사이트에서 직접 확인하세요.</p>
   <p class="tip"><b>가짜 예매 사이트에 주의하세요.</b> 바티칸·노트르담·오르세는 공식 사이트가 직접 경고를 띄우고 있습니다. 검색해서 나오는 상단 광고가 아니라, 위 항목의 사이트 버튼으로 들어가세요. 특히 <b>노트르담은 입장이 100% 무료</b>라 돈을 받는 곳은 전부 가짜입니다.</p>
   <p class="tip">조사 시점은 2026년 8월 28일입니다. 요금·정책은 바뀔 수 있습니다. 체크 상태는 이 기기에만 저장됩니다.</p>
 </section>
@@ -662,42 +691,43 @@ document.addEventListener('click',e=>{
 document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!lb.hidden)closeLb();});
 
 /* 체크 상태는 순서가 아니라 항목 id 로 저장한다.
-   순서로 저장하면 목록을 고칠 때마다 체크가 엉뚱한 줄로 옮겨간다. */
+   순서로 저장하면 목록을 고칠 때마다 체크가 엉뚱한 줄로 옮겨간다.
+   저장 범위는 이 기기뿐이다 — 가족끼리 공유하려면 바깥 저장소가 필요하다. */
 let saved={}; try{saved=JSON.parse(localStorage.getItem('trip27todo')||'{}');}catch(e){}
 const WD='일월화수목금토';
-function whenLabel(t){
-  if(!t.open) return '상시 예약 가능';
+function whenCell(t){
+  if(!t.open) return '상시';
   const [y,m,d]=t.open.split('-').map(Number);
-  return t.open+' ('+WD[new Date(y,m-1,d).getDay()]+') 예약 시작';
+  return t.open+'<br><span class="wd">('+WD[new Date(y,m-1,d).getDay()]+')</span>'
+       + (t.sure?'':'<i class="guess">추정</i>');
 }
 /* 예약이 빨리 열리는 것부터. 상시 항목은 뒤로 */
 const TSORT=TODOS.slice().sort((a,b)=>
   (a.open?0:1)-(b.open?0:1) || (a.open||'').localeCompare(b.open||''));
 document.getElementById('todos').innerHTML=TSORT.map(t=>
-'<div class="chk'+(saved[t.id]?' done':'')+'" data-id="'+t.id+'" role="checkbox" tabindex="0"'+
-' aria-checked="'+(saved[t.id]?'true':'false')+'"><span class="box" aria-hidden="true">✓</span>'+
-'<span class="ctext"><b>'+t.t+'</b>'+
-  '<span class="cwhen'+(t.open?'':' anytime')+'">'+whenLabel(t)+
-    (t.sure?'':'<i class="guess">추정</i>')+'</span>'+
-  '<span class="cdesc">'+t.d+'</span>'+
-  '<a class="csite" href="'+t.url+'" target="_blank" rel="noopener">'+t.site+' ↗</a>'+
-'</span></div>').join('');
-document.querySelectorAll('.chk').forEach(el=>{
-  const toggle=()=>{
-    const on=el.classList.toggle('done');
-    el.setAttribute('aria-checked',on?'true':'false');
-    saved[el.dataset.id]=on;
-    try{localStorage.setItem('trip27todo',JSON.stringify(saved));}catch(e){}
-  };
-  el.addEventListener('click',e=>{
-    if(e.target.closest('.csite')) return;   // 사이트 링크는 체크를 건드리지 않는다
-    toggle();
-  });
-  el.addEventListener('keydown',e=>{
-    if(e.target.closest('.csite')) return;
-    if(e.key===' '||e.key==='Enter'){e.preventDefault();toggle();}
-  });
-});
+ '<tr class="brow'+(saved[t.id]?' done':'')+(t.open?'':' anytime')+'" data-id="'+t.id+'">'+
+   '<td class="bchk"><button type="button" class="box" role="checkbox" aria-checked="'+
+     (saved[t.id]?'true':'false')+'" aria-label="'+t.t+' 예약 완료">✓</button></td>'+
+   '<td class="bwhen">'+whenCell(t)+'</td>'+
+   '<td class="bitem">'+
+     '<button type="button" class="bname" aria-expanded="false" aria-controls="det-'+t.id+'">'+t.t+'</button>'+
+     '<a class="csite" href="'+t.url+'" target="_blank" rel="noopener">'+t.site+' ↗</a>'+
+   '</td>'+
+ '</tr>'+
+ '<tr class="bdet" id="det-'+t.id+'" hidden><td colspan="3">'+t.d+'</td></tr>').join('');
+
+document.querySelectorAll('.btab .box').forEach(b=>b.addEventListener('click',()=>{
+  const row=b.closest('.brow'), on=row.classList.toggle('done');
+  b.setAttribute('aria-checked',on?'true':'false');
+  saved[row.dataset.id]=on;
+  try{localStorage.setItem('trip27todo',JSON.stringify(saved));}catch(e){}
+}));
+document.querySelectorAll('.btab .bname').forEach(b=>b.addEventListener('click',()=>{
+  const row=b.closest('.brow'), det=document.getElementById(b.getAttribute('aria-controls'));
+  const open=row.classList.toggle('open');
+  b.setAttribute('aria-expanded',open?'true':'false');
+  det.hidden=!open;
+}));
 
 function showTab(t){
   document.querySelectorAll('nav button').forEach(x=>{
