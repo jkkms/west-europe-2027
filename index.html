@@ -76,6 +76,11 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .droute svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;
             stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
 .droute:hover{border-color:var(--alpine);color:var(--alpine)}
+.bprog{display:flex;align-items:center;gap:11px;margin:0 0 14px}
+.bbar{flex:1;height:6px;border-radius:99px;background:var(--frost);overflow:hidden}
+.bbar i{display:block;height:100%;width:0;background:var(--alpine);border-radius:99px;
+        transition:width .25s}
+#bcount{font-family:var(--mono);font-size:11.5px;color:var(--slate);flex:0 0 auto}
 .rnum{width:21px;height:21px;border-radius:50%;background:var(--ember);color:#fff;
       font-family:var(--mono);font-size:11px;font-weight:500;line-height:21px;text-align:center;
       box-shadow:0 1px 4px rgba(16,24,33,.4)}
@@ -285,7 +290,7 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
 <section class="panel" id="p-map" role="tabpanel" aria-labelledby="t-map">
   <p class="eyebrow">Map</p><h2>지도</h2>
   <div class="chips" id="chips" role="group" aria-label="도시별 보기"></div>
-  <div class="routebar" id="routebar" hidden>
+  <div class="routebar" id="routebar" role="status" hidden>
     <span id="routetxt"></span>
     <button type="button" id="routeclear">지우기</button>
   </div>
@@ -345,6 +350,7 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
 
 <section class="panel" id="p-todo" role="tabpanel" aria-labelledby="t-todo">
   <p class="eyebrow">Before you go</p><h2>예약 체크리스트</h2>
+  <div class="bprog"><div class="bbar"><i id="bfill"></i></div><span id="bcount"></span></div>
   <table class="btab">
     <thead><tr>
       <th class="c1"><span class="sr">완료</span></th>
@@ -846,12 +852,19 @@ document.getElementById('todos').innerHTML=TSORT.map(t=>
  '</tr>'+
  '<tr class="bdet" id="det-'+t.id+'" hidden><td colspan="3">'+t.d+'</td></tr>').join('');
 
+function drawProgress(){
+  const done=TODOS.filter(t=>saved[t.id]).length, all=TODOS.length;
+  document.getElementById('bfill').style.width=Math.round(done/all*100)+'%';
+  document.getElementById('bcount').textContent=done+' / '+all+' 완료';
+}
 document.querySelectorAll('.btab .box').forEach(b=>b.addEventListener('click',()=>{
   const row=b.closest('.brow'), on=row.classList.toggle('done');
   b.setAttribute('aria-checked',on?'true':'false');
   saved[row.dataset.id]=on;
   try{localStorage.setItem('trip27todo',JSON.stringify(saved));}catch(e){}
+  drawProgress();
 }));
+drawProgress();
 document.querySelectorAll('.btab .bname').forEach(b=>b.addEventListener('click',()=>{
   const row=b.closest('.brow'), det=document.getElementById(b.getAttribute('aria-controls'));
   const open=row.classList.toggle('open');
