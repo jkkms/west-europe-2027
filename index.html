@@ -788,11 +788,7 @@ function showTab(t){
   });
   document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on',x.id==='p-'+t));
   window.scrollTo({top:0});
-  if(t==='map'&&map) setTimeout(()=>{
-    map.invalidateSize();
-    /* 크기가 잡힌 뒤 한 번만 다시 맞춘다. 매번 하면 사용자가 옮겨 둔 화면이 튄다. */
-    if(!mapFitted){ mapFitted=true; fit(curCity); }
-  },120);
+  if(t==='map'&&map) fitWhenSized();
 }
 document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.t)));
 
@@ -822,6 +818,32 @@ function fit(city){
   }
   if(!map) return;
   map.fitBounds(set.map(l=>[l.lat,l.lng]),{padding:[45,45],maxZoom:14});
+}
+/* 지도가 "실제로 크기를 가진" 순간을 기다렸다가 딱 한 번 맞춘다.
+   고정 시간으로 기다리면 안 된다 — 탭이 보이게 된 뒤 120ms 가 지나도
+   폭이 0 으로 잡히는 경우가 있었고, 그 상태로 fitBounds 를 하면
+   줌이 maxZoom 에 걸려 엉뚱한 곳이 확대된 채 굳는다. */
+function fitWhenSized(){
+  if(mapFitted||!map) return;
+  const tryFit=()=>{
+    if(mapFitted) return true;
+    map.invalidateSize();
+    const s=map.getSize();
+    if(s.x>0&&s.y>0){ mapFitted=true; fit(curCity); return true; }
+    return false;
+  };
+  if(tryFit()) return;
+  const el=document.getElementById('map');
+  let ro=null;
+  if(window.ResizeObserver&&el){
+    ro=new ResizeObserver(()=>{ if(tryFit()&&ro) ro.disconnect(); });
+    ro.observe(el);
+  }
+  /* 관찰자가 없거나 크기 변화가 한 번도 안 잡히는 경우를 위한 재시도 */
+  let n=0;
+  const timer=setInterval(()=>{
+    if(tryFit()||++n>20){ clearInterval(timer); if(ro) ro.disconnect(); }
+  },100);
 }
 function focusOn(id){
   const l=byId[id]; if(!l||!map) return;
@@ -882,13 +904,8 @@ window.addEventListener('load',()=>{
     });
     ch.classList.add('on'); ch.setAttribute('aria-pressed','true'); fit(ch.dataset.c);
   }));
-  fit('전체');
-  setTimeout(()=>{
-    map.invalidateSize();
-    if(!mapFitted && document.getElementById('p-map').classList.contains('on')){
-      mapFitted=true; fit(curCity);
-    }
-  },250);
+  fit('전체');   // 구글 지도 버튼 주소를 채워 두기 위한 호출. 화면 맞춤은 아래가 담당한다
+  if(document.getElementById('p-map').classList.contains('on')) fitWhenSized();
   window.addEventListener('resize',()=>map.invalidateSize());
 });
 
