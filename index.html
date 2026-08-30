@@ -7,6 +7,14 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-title" content="서유럽 2027">
+<!-- 검색엔진 색인 차단.
+     프로젝트 페이지(user.github.io/저장소/)에서는 폴더 안에 robots.txt 를 둬도
+     크롤러가 읽지 않는다 — robots.txt 는 도메인 루트에서만 유효하다.
+     그래서 페이지마다 붙이는 이 메타 태그가 유일하게 확실한 방법이다.
+     noindex 는 "수집은 하되 색인하지 말라"라서, 수집 자체를 막는 robots.txt 보다
+     오히려 색인 방지에는 더 확실하다(막힌 주소도 목록에는 뜰 수 있으므로). -->
+<meta name="robots" content="noindex, nofollow, noarchive, nosnippet">
+<meta name="googlebot" content="noindex, nofollow">
 <meta name="theme-color" content="#eef1f4" media="(prefers-color-scheme:light)">
 <meta name="theme-color" content="#111a22" media="(prefers-color-scheme:dark)">
 <link rel="manifest" href="manifest.webmanifest">
