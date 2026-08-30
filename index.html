@@ -27,7 +27,7 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js" defer></script>
 <style>
 :root{
-  --ink:#16202b;--slate:#5a6b7a;--paper:#eef1f4;--card:#fff;--frost:#d5dee5;--soft:#e6ebef;
+  --ink:#131c25;--slate:#59697a;--paper:#e9edf1;--card:#fff;--frost:#c9d5df;--soft:#e2e9ee;
   --alpine:#2e6e8e;--deep:#1d4f68;--ember:#b64f2b;--emberbg:#f6ece7;--moss:#4a7a5e;--plum:#7c5cbf;
   --mossbg:#e9f0eb;
   --sans:'IBM Plex Sans KR',system-ui,sans-serif;
@@ -35,7 +35,7 @@
   --serif:'Gowun Batang',serif;--nav:64px;
 }
 @media (prefers-color-scheme:dark){:root{
-  --ink:#e8edf1;--slate:#9aa9b6;--paper:#111a22;--card:#18232d;--frost:#2b3945;--soft:#223039;
+  --ink:#e8edf1;--slate:#9aa9b6;--paper:#0f171e;--card:#18232d;--frost:#31404d;--soft:#202d37;
   --alpine:#6aa9c6;--deep:#8fc3da;--ember:#d97a52;--emberbg:#2a1e18;--moss:#7fb094;--plum:#a58ae0;
   --mossbg:#1b2620;}}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -49,30 +49,69 @@ header{position:sticky;top:0;z-index:20;background:var(--paper);padding:calc(env
 .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.14em;color:var(--alpine);text-transform:uppercase;margin:0 0 4px}
 h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .spot{font:inherit;color:inherit;background:none;border:0;padding:0;cursor:pointer;border-bottom:1px dotted var(--alpine)}
-.note{display:flex;gap:10px;margin-top:12px;padding:10px 12px;background:var(--emberbg);border-left:3px solid var(--ember);border-radius:0 6px 6px 0;font-size:13px}
+.note{display:flex;gap:10px;margin-top:12px;padding:10px 12px;background:var(--emberbg);border-left:3px solid var(--ember);border-radius:0 2px 2px 0;font-size:13px}
 .note b{font-family:var(--mono);font-size:10px;color:var(--ember);flex:0 0 auto;padding-top:2px}
-.drow{background:var(--card);border:1px solid var(--frost);border-radius:12px;margin-bottom:8px;overflow:hidden}
-.dhead{display:flex;align-items:center;gap:12px;padding:13px 15px;cursor:pointer;
-       width:100%;text-align:left;background:none;border:0;font:inherit;color:inherit}
-.ddate{font-family:var(--mono);font-size:13px;font-weight:500;flex:0 0 58px}
-.dcity{font-size:11px;font-family:var(--mono);color:#fff;background:var(--alpine);border-radius:99px;padding:2px 9px;flex:0 0 auto}
+/* ── 여행 리본 — 도시 덩어리 위에 그 도시의 날짜를 얹은 가로 한 줄.
+   일정 탭에서 아래로 훑어 내려가는 동작을 없애려고 날짜 고르기를 여기로 모았다.
+   sticky top 은 CSS 상수다. JS 로 헤더 높이를 재서 넣었더니, 화면에 보이지 않는
+   상태로 로드되면 높이가 0 으로 잡혀 리본이 헤더 뒤에 숨었다. 대신 일정 탭에서는
+   헤더의 sticky 를 풀어(body.plantab) 리본만 맨 위에 붙인다 — 잴 값이 없다. */
+.drail{position:sticky;top:0;z-index:25;display:flex;align-items:stretch;overflow-x:auto;
+       margin:0 -16px 14px;padding:7px 16px 9px;background:var(--paper);
+       border-bottom:1px solid var(--frost);box-shadow:0 3px 0 -2px var(--frost);
+       scrollbar-width:none}
+.drail::-webkit-scrollbar{display:none}
+body.plantab header{position:static}
+.dgrp{flex:0 0 auto;display:flex;flex-direction:column;gap:5px;padding:0 11px;
+      border-left:1px solid var(--frost)}
+.dgrp:first-child{padding-left:0;border-left:0}
+.dglab{font-family:var(--mono);font-size:9.5px;line-height:1.15;letter-spacing:.13em;
+       text-transform:uppercase;color:var(--slate);white-space:nowrap;padding-left:1px}
+.dglab i{font-style:normal;color:var(--alpine)}
+.dgrp.move .dglab{color:var(--moss)}
+.dgp{display:flex;gap:5px}
+.dpill{flex:0 0 auto;min-width:44px;min-height:44px;display:flex;flex-direction:column;
+       align-items:center;justify-content:center;gap:1px;padding:3px 7px;border-radius:2px;
+       border:1px solid var(--frost);background:var(--card);color:var(--slate);
+       font-family:var(--mono);line-height:1.1;cursor:pointer}
+.dpill b{font-size:13px;font-weight:500;color:var(--ink)}
+.dpill span{font-size:9.5px}
+.dpill.today{border-color:var(--alpine)}
+.dpill.on{background:var(--deep);border-color:var(--deep)}
+.dpill.on b,.dpill.on span{color:#fff}
+
+/* ── 하루 카드 — 화면에는 고른 하루만 둔다. 인쇄에서는 열다섯 장을 모두 펼친다. */
+.dcard{display:none;background:var(--card);border:1px solid var(--frost);padding:17px 16px 18px}
+.dcard.on{display:block}
+.dctop{display:flex;align-items:center;gap:9px;flex-wrap:wrap}
+.dcdate{font-family:var(--mono);font-size:19px;font-weight:500;letter-spacing:.02em}
+.dcw{font-family:var(--mono);font-size:12px;color:var(--slate);margin-left:-4px}
+.dctitle{font-family:var(--serif);font-weight:700;font-size:20px;line-height:1.35;margin:8px 0 0}
+.dcrule{height:1px;background:var(--frost);margin-top:13px}
+/* 도시 덩어리 머리 — 화면에서는 리본이 그 역할을 하므로 인쇄에서만 나온다 */
+.dgroup{display:none}
+/* 앞·뒤 날 이동 */
+.dnav{display:flex;gap:8px;margin-top:10px}
+.dnav button{flex:1;min-height:46px;display:flex;align-items:center;justify-content:center;
+       gap:8px;background:var(--card);border:1px solid var(--frost);border-radius:2px;
+       color:var(--deep);font:inherit;font-size:13px;cursor:pointer}
+.dnav button[disabled]{opacity:.35;cursor:default}
+.dnav button:hover:not([disabled]){border-color:var(--alpine);color:var(--alpine)}
+.dnav .dk{font-family:var(--mono);font-size:12px}
+.dcity{font-size:11px;font-family:var(--mono);color:#fff;background:var(--alpine);border-radius:2px;padding:2px 8px;flex:0 0 auto}
 .dcity.move{background:var(--moss)}
-.dtitle{flex:1;font-size:14px;line-height:1.5;color:var(--slate)}
 /* 펼침 화살표 — 일정·준비·항공 세 탭이 같은 모양을 쓴다.
    닫혀 있으면 오른쪽, 펼치면 90도 돌아 아래쪽을 본다. */
 .caret{flex:0 0 auto;display:inline-flex;align-items:center;justify-content:center;
        width:30px;height:30px;border-radius:50%;background:var(--soft);color:var(--alpine);
        transition:transform .2s,background-color .15s,color .15s}
 .caret svg{width:18px;height:18px;stroke:currentColor;fill:none;stroke-width:2.4;stroke-linecap:round;stroke-linejoin:round}
-.drow.open .caret,.brow.open .caret,.seatbox[open] .caret{transform:rotate(90deg);background:var(--alpine);color:#fff}
-.drow.today{border-color:var(--alpine);border-width:2px}
-.dbody{display:none;padding:0 15px 15px;border-top:1px solid var(--frost)}
-.drow.open .dbody{display:block}
+.brow.open .caret,.seatbox[open] .caret{transform:rotate(90deg);background:var(--alpine);color:#fff}
 .dplan{font-size:14.5px;line-height:1.75;padding:13px 0 0}
-.dnote{display:flex;gap:10px;margin-top:12px;padding:10px 12px;background:var(--emberbg);border-left:3px solid var(--ember);border-radius:0 6px 6px 0;font-size:13px;line-height:1.6}
+.dnote{display:flex;gap:10px;margin-top:12px;padding:10px 12px;background:var(--emberbg);border-left:3px solid var(--ember);border-radius:0 2px 2px 0;font-size:13px;line-height:1.6}
 .dnote b{font-family:var(--mono);font-size:10px;color:var(--ember);flex:0 0 auto;padding-top:2px}
 .dopt{margin-top:10px;padding:11px 13px;background:var(--mossbg);border-left:3px solid var(--moss);
-      border-radius:0 6px 6px 0;font-size:13px;line-height:1.65}
+      border-radius:0 2px 2px 0;font-size:13px;line-height:1.65}
 .dopt b{display:block;font-family:var(--mono);font-size:10px;letter-spacing:.06em;color:var(--moss);margin-bottom:5px}
 .dopt ul{margin:0;padding-left:17px}
 .dopt li{margin:4px 0}
@@ -80,51 +119,51 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 /* 이 날 동선 보기 */
 .droute{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
         margin-top:12px;padding:11px;background:var(--card);border:1px solid var(--frost);
-        border-radius:10px;color:var(--deep);font:inherit;font-size:13.5px;cursor:pointer}
+        border-radius:2px;color:var(--deep);font:inherit;font-size:13.5px;cursor:pointer}
 .droute svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;
             stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
 .droute:hover{border-color:var(--alpine);color:var(--alpine)}
 .printbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
            margin:16px 0 4px;padding:12px;background:var(--card);border:1px solid var(--frost);
-           border-radius:10px;color:var(--deep);font:inherit;font-size:13.5px;cursor:pointer}
+           border-radius:2px;color:var(--deep);font:inherit;font-size:13.5px;cursor:pointer}
 .printbtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;
               stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
 .printbtn:hover{border-color:var(--alpine);color:var(--alpine)}
 .bprog{display:flex;align-items:center;gap:11px;margin:0 0 14px}
-.bbar{flex:1;height:6px;border-radius:99px;background:var(--frost);overflow:hidden}
-.bbar i{display:block;height:100%;width:0;background:var(--alpine);border-radius:99px;
+.bbar{flex:1;height:6px;border-radius:2px;background:var(--frost);overflow:hidden}
+.bbar i{display:block;height:100%;width:0;background:var(--alpine);border-radius:2px;
         transition:width .25s}
 #bcount{font-family:var(--mono);font-size:11.5px;color:var(--slate);flex:0 0 auto}
-.legs{margin-top:12px;background:var(--card);border:1px solid var(--frost);border-radius:10px;
+.legs{margin-top:12px;background:var(--card);border:1px solid var(--frost);border-radius:2px;
        padding:6px 12px 12px}
 .legs[hidden]{display:none}
 .leg{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--soft);
      font-size:13px}
 .leg:last-of-type{border-bottom:0}
 .lgn{flex:0 0 auto;font-family:var(--mono);font-size:10.5px;color:var(--ember);
-     background:var(--emberbg);border-radius:99px;padding:2px 7px}
+     background:var(--emberbg);border-radius:2px;padding:2px 7px}
 .lgt{flex:1;min-width:0;line-height:1.45}
 .lgd{flex:0 0 auto;font-family:var(--mono);font-size:11.5px;color:var(--slate)}
 .lgb{flex:0 0 auto;font-family:var(--mono);font-size:11px;color:var(--deep);text-decoration:none;
-     border:1px solid var(--frost);border-radius:99px;padding:4px 9px}
+     border:1px solid var(--frost);border-radius:2px;padding:4px 9px}
 .lgb:hover{border-color:var(--alpine);color:var(--alpine)}
 .lgall{display:block;margin-top:10px;padding:10px;text-align:center;font-family:var(--mono);
-       font-size:12px;color:var(--deep);text-decoration:none;background:var(--soft);border-radius:8px}
+       font-size:12px;color:var(--deep);text-decoration:none;background:var(--soft);border-radius:2px}
 .lgall:hover{color:var(--alpine)}
 .lgnote{margin:9px 0 0;font-size:11.5px;color:var(--slate);line-height:1.6}
 .rnum{width:21px;height:21px;border-radius:50%;background:var(--ember);color:#fff;
       font-family:var(--mono);font-size:11px;font-weight:500;line-height:21px;text-align:center;
       box-shadow:0 1px 4px rgba(16,24,33,.4)}
 .routebar{display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 13px;
-          background:var(--emberbg);border-left:3px solid var(--ember);border-radius:0 8px 8px 0;
+          background:var(--emberbg);border-left:3px solid var(--ember);border-radius:0 2px 2px 0;
           font-size:13px;line-height:1.5}
 .routebar[hidden]{display:none}
 .routebar span{flex:1}
 .routebar button{flex:0 0 auto;font-family:var(--mono);font-size:11.5px;color:var(--ember);
-                 background:none;border:1px solid currentColor;border-radius:99px;
+                 background:none;border:1px solid currentColor;border-radius:2px;
                  padding:4px 11px;cursor:pointer}
 .scards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:14px}
-.scard{background:var(--soft);border-radius:10px;overflow:hidden;border:1px solid var(--frost)}
+.scard{background:var(--soft);border-radius:2px;overflow:hidden;border:1px solid var(--frost)}
 .sthumb{width:100%;aspect-ratio:3/2;object-fit:cover;display:block;background:var(--soft)}
 .sph-none{color:var(--frost)}
 .sph{width:100%;aspect-ratio:3/2;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10.5px;color:var(--slate);background:var(--soft)}
@@ -132,9 +171,9 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .sbody b{display:block;font-size:15px;font-weight:500;line-height:1.35}
 .sbody span{display:block;font-size:12.5px;color:var(--slate);line-height:1.55;margin-top:4px}
 .chips{display:flex;gap:6px;overflow-x:auto;padding:0 0 12px}
-.chip{flex:0 0 auto;font-family:var(--mono);font-size:12px;padding:6px 13px;border-radius:99px;border:1px solid var(--frost);background:var(--card);color:var(--slate);cursor:pointer}
+.chip{flex:0 0 auto;font-family:var(--mono);font-size:12px;padding:6px 13px;border-radius:2px;border:1px solid var(--frost);background:var(--card);color:var(--slate);cursor:pointer}
 .chip.on{background:var(--alpine);border-color:var(--alpine);color:#fff}
-#map{height:420px;border:1px solid var(--frost);border-radius:12px;background:var(--soft)}
+#map{height:420px;border:1px solid var(--frost);border-radius:2px;background:var(--soft)}
 .pin{width:26px;height:26px;border-radius:50%;background:var(--card);border:2.5px solid var(--alpine);display:flex;align-items:center;justify-content:center;font-size:12px;box-shadow:0 1px 4px rgba(22,32,43,.3)}
 .pin.air{border-color:var(--ember)}.pin.rail{border-color:var(--moss)}.pin.stay{border-color:var(--plum)}
 .leaflet-container{font-family:var(--sans)}
@@ -147,17 +186,17 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .mlegend{display:flex;flex-wrap:wrap;gap:10px 16px;padding:12px 2px 0;font-family:var(--mono);font-size:11.5px;color:var(--slate)}
 .mlegend i{display:inline-block;width:10px;height:10px;border-radius:50%;border:2.5px solid;margin-right:5px;vertical-align:-1px}
 .gbtn{display:flex;align-items:center;justify-content:center;gap:8px;margin-top:12px;padding:12px;
-      background:var(--card);border:1px solid var(--frost);border-radius:10px;
+      background:var(--card);border:1px solid var(--frost);border-radius:2px;
       color:var(--deep);text-decoration:none;font-size:13.5px}
 .gbtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
 .gbtn:hover{border-color:var(--alpine);color:var(--alpine)}
-.fcard{background:var(--card);border:1px solid var(--frost);border-radius:12px;padding:16px;margin-bottom:12px}
+.fcard{background:var(--card);border:1px solid var(--frost);border-radius:2px;padding:16px;margin-bottom:12px}
 .frow{display:flex;justify-content:space-between;gap:12px;padding:7px 0;border-bottom:1px solid var(--soft);font-size:14px}
 .frow:last-child{border-bottom:0}
 .frow span:first-child{color:var(--slate);font-size:13px}
 .frow span:last-child{font-family:var(--mono);font-size:13px;text-align:right}
 .seats{display:flex;flex-wrap:wrap;gap:6px;margin-top:10px}
-.seatbox{margin-top:13px;border:1px solid var(--frost);border-radius:9px;overflow:hidden}
+.seatbox{margin-top:13px;border:1px solid var(--frost);border-radius:2px;overflow:hidden}
 .seatbox summary{display:flex;align-items:center;gap:8px;padding:8px 10px 8px 13px;cursor:pointer;
                  list-style:none;background:var(--soft);color:var(--deep);
                  font-family:var(--mono);font-size:12.5px}
@@ -166,12 +205,12 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .seatbox summary .caret{margin-left:auto}
 .smapcap{font-size:11.5px;color:var(--slate);text-align:center;margin:0 0 12px;padding:0 12px}
 .smap{display:block;width:auto;height:auto;max-width:100%;max-height:48vh;
-      margin:12px auto 8px;border:1px solid var(--frost);border-radius:6px;cursor:zoom-in;background:#fff}
-.seat{font-family:var(--mono);font-size:12px;background:var(--ember);color:#fff;border-radius:6px;padding:4px 10px}
+      margin:12px auto 8px;border:1px solid var(--frost);border-radius:2px;cursor:zoom-in;background:#fff}
+.seat{font-family:var(--mono);font-size:12px;background:var(--ember);color:#fff;border-radius:2px;padding:4px 10px}
 /* ── 예약 체크리스트 표 ── */
 .sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0);white-space:nowrap}
 .btab{width:100%;table-layout:fixed;border-collapse:collapse;background:var(--card);
-      border:1px solid var(--frost);border-radius:12px;overflow:hidden}
+      border:1px solid var(--frost);border-radius:2px;overflow:hidden}
 .btab thead th{font-family:var(--mono);font-size:10px;letter-spacing:.08em;color:var(--slate);
       text-transform:uppercase;font-weight:400;text-align:left;padding:10px 8px;
       background:var(--soft);border-bottom:1px solid var(--frost)}
@@ -180,14 +219,14 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .btab td{padding:11px 8px;border-bottom:1px solid var(--soft);vertical-align:top}
 .btab tr:last-child td{border-bottom:0}
 .bchk{text-align:center}
-.box{width:22px;height:22px;border:1.5px solid var(--frost);border-radius:6px;background:none;
+.box{width:22px;height:22px;border:1.5px solid var(--frost);border-radius:2px;background:none;
      color:transparent;font-size:13px;cursor:pointer;padding:0;line-height:1;display:block;margin:1px auto}
 .brow.done .box{background:var(--alpine);border-color:var(--alpine);color:#fff}
 .bwhen{font-family:var(--mono);font-size:11.5px;color:var(--alpine);line-height:1.6;white-space:nowrap}
 .bwhen .wd{color:var(--slate)}
 .brow.anytime .bwhen{color:var(--slate)}
 .guess{font-style:normal;display:block;width:fit-content;margin-top:4px;font-size:9.5px;
-       padding:1px 6px;border-radius:99px;background:var(--emberbg);color:var(--ember)}
+       padding:1px 6px;border-radius:2px;background:var(--emberbg);color:var(--ember)}
 .bname{display:flex;align-items:center;gap:9px;width:100%;font:inherit;font-size:14px;
        font-weight:500;color:inherit;text-align:left;background:none;border:0;padding:0;
        cursor:pointer;line-height:1.4}
@@ -195,7 +234,7 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .brow.done .bname{color:var(--slate);text-decoration:line-through}
 .csite{display:inline-flex;align-items:center;gap:5px;max-width:100%;margin-top:6px;
        font-family:var(--mono);font-size:11px;color:var(--deep);text-decoration:none;
-       border:1px solid var(--frost);border-radius:99px;padding:3px 9px}
+       border:1px solid var(--frost);border-radius:2px;padding:3px 9px}
 .cst{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;min-width:0}
 .csite .arw{display:none}
 .csite:hover{border-color:var(--alpine);color:var(--alpine)}
@@ -205,34 +244,33 @@ nav{position:fixed;left:0;right:0;bottom:0;z-index:30;background:var(--card);bor
 nav button{flex:1;background:none;border:0;padding:9px 0 8px;font-family:var(--sans);font-size:10.5px;color:var(--slate);cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px}
 nav button.on{color:var(--alpine);font-weight:500}
 nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;stroke-linecap:round;stroke-linejoin:round}
-.tip{font-size:12.5px;color:var(--slate);line-height:1.75;margin:16px 0 0;padding:12px;background:var(--card);border:1px solid var(--frost);border-radius:10px}
+.tip{font-size:12.5px;color:var(--slate);line-height:1.75;margin:16px 0 0;padding:12px;background:var(--card);border:1px solid var(--frost);border-radius:2px}
 .tip code{font-family:var(--mono);font-size:11.5px;background:var(--soft);padding:1px 5px;border-radius:4px}
 .lb{position:fixed;inset:0;z-index:9999;background:rgba(16,24,33,.72);display:flex;align-items:flex-end;justify-content:center}
 .lb[hidden]{display:none}
-.lbp{background:var(--card);width:100%;max-width:520px;max-height:88vh;overflow-y:auto;border-radius:16px 16px 0 0;padding:18px 18px calc(20px + env(safe-area-inset-bottom))}
+.lbp{background:var(--card);width:100%;max-width:520px;max-height:88vh;overflow-y:auto;border-radius:3px 3px 0 0;padding:18px 18px calc(20px + env(safe-area-inset-bottom))}
 .lbh{display:flex;align-items:center;gap:12px;padding-bottom:12px;border-bottom:1px solid var(--frost)}
 .lbh h3{font-family:var(--serif);font-weight:700;font-size:19px;margin:0;flex:1}
-.lbx{font-size:19px;background:none;border:1px solid var(--frost);color:var(--slate);width:32px;height:32px;border-radius:8px;cursor:pointer}
+.lbx{font-size:19px;background:none;border:1px solid var(--frost);color:var(--slate);width:32px;height:32px;border-radius:2px;cursor:pointer}
 .pgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:14px}
-.pgrid img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:8px;background:var(--soft);display:block}
+.pgrid img{width:100%;aspect-ratio:4/3;object-fit:cover;border-radius:2px;background:var(--soft);display:block}
 .pempty{font-size:13px;color:var(--slate);line-height:1.75;margin-top:14px}
 .pempty code{font-family:var(--mono);font-size:11.5px;background:var(--soft);padding:1px 5px;border-radius:4px}
 .pact{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap}
-.pact a,.pact button{font-family:var(--mono);font-size:12px;color:var(--deep);text-decoration:none;border:1px solid var(--frost);border-radius:99px;padding:6px 13px;background:var(--card);cursor:pointer}
+.pact a,.pact button{font-family:var(--mono);font-size:12px;color:var(--deep);text-decoration:none;border:1px solid var(--frost);border-radius:2px;padding:6px 13px;background:var(--card);cursor:pointer}
 .smapbtn{display:block;width:100%;padding:0;background:none;border:0;cursor:zoom-in;font:inherit}
 
 /* ── 키보드 초점 ── */
-:focus-visible{outline:2px solid var(--alpine);outline-offset:2px;border-radius:4px}
-.dhead:focus-visible{outline-offset:-2px}
+:focus-visible{outline:2px solid var(--alpine);outline-offset:2px;border-radius:2px}
 
 /* ── 새 버전 알림 ── */
 .toast{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(var(--nav) + env(safe-area-inset-bottom) + 14px);
        z-index:40;display:flex;align-items:center;gap:12px;max-width:calc(100% - 32px);
-       background:var(--ink);color:var(--paper);border-radius:10px;padding:11px 14px;font-size:13px;
+       background:var(--ink);color:var(--paper);border-radius:2px;padding:11px 14px;font-size:13px;
        box-shadow:0 4px 16px rgba(16,24,33,.28)}
 .toast[hidden]{display:none}
 .toast button{font-family:var(--mono);font-size:12px;background:none;border:1px solid currentColor;
-              color:inherit;border-radius:99px;padding:4px 12px;cursor:pointer;flex:0 0 auto}
+              color:inherit;border-radius:2px;padding:4px 12px;cursor:pointer;flex:0 0 auto}
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition-duration:.01ms !important;animation-duration:.01ms !important}
@@ -249,6 +287,10 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
   .bwhen .wd{display:block}
   .csite{font-size:10px;padding:3px 7px;gap:4px}
   .bname{font-size:13.5px}
+  .drail{padding:8px 16px 10px}
+  .dgrp{padding:0 8px}
+  .dcard{padding:15px 14px 16px}
+  .dctitle{font-size:18px}
 }
 
 /* ── 태블릿 ── */
@@ -276,15 +318,20 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
   .panel{padding-top:24px}
   h2{font-size:23px}
   #map{height:560px}
-  .dhead{padding:16px 20px}
-  .dhead:hover{background:var(--soft)}
+  .drail{top:58px;margin:0 -28px 20px;padding:10px 28px 12px}
+  .dpill{min-width:50px;min-height:48px}
+  .dpill b{font-size:14px}
+  .dpill:hover{border-color:var(--alpine)}
+  .dcard{padding:24px 26px 26px}
+  .dcdate{font-size:23px}
+  .dctitle{font-size:24px;margin-top:9px}
+  .dnav button{font-size:14px}
   .spot:hover{background:var(--soft)}
   .chip:hover{border-color:var(--alpine)}
   .pgrid{grid-template-columns:repeat(3,1fr)}
   .scards{grid-template-columns:repeat(3,1fr)}
-  .ddate{flex:0 0 70px}
   .lb{align-items:center;padding:32px}
-  .lbp{border-radius:14px;max-width:720px;max-height:84vh;padding:22px 24px 26px}
+  .lbp{border-radius:3px;max-width:720px;max-height:84vh;padding:22px 24px 26px}
   .fcard{max-width:none}
   .tip{font-size:13.5px}
   .toast{bottom:24px}
@@ -314,7 +361,7 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
      · Chromium 은 flex 안에서 break-inside:avoid 를 무시 → 행을 display:table 로
    ───────────────────────────────────────────────────────────── */
 @media print{
-  nav,#p-map,.chips,.tip,.toast,.lb,.caret,.droute,.scards,.bprog,.printbtn,.legs,
+  nav,#p-map,.chips,.drail,.dnav,.tip,.toast,.lb,.caret,.droute,.scards,.bprog,.printbtn,.legs,
   .count,.eyebrow,.seatbox,.csite{display:none !important}
   :root{--ink:#000;--slate:#333;--paper:#fff;--card:#fff;--frost:#bbb;--soft:#f2f2f2;
         --alpine:#000;--deep:#000;--ember:#000;--emberbg:#f2f2f2;--moss:#000;--mossbg:#f2f2f2}
@@ -327,16 +374,22 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
   .panel{display:block !important;padding-top:14pt;break-before:auto}
   .panel+.panel{border-top:1px solid #bbb;margin-top:14pt}
   h2{font-size:13pt;margin:0 0 8pt}
-  /* 펼침 상태와 무관하게 전부 보이게 */
-  .dbody{display:block !important;border-top:1px solid #ddd}
-  .drow{display:table;width:100%;border:0;border-bottom:1px solid #ddd;border-radius:0;
-        margin:0;break-inside:avoid;page-break-inside:avoid}
-  .dhead{display:block;padding:6pt 0 3pt;font-size:11pt}
-  .ddate,.dcity,.dtitle{display:inline;font-size:10.5pt}
+  /* 화면에서는 하루만 보이지만 종이에는 열다섯 장을 모두 싣는다.
+     Chromium 이 flex 안에서 break-inside 를 무시하므로 하루 카드를 table 로 둔다. */
+  .dcard{display:table !important;width:100%;border:0;border-bottom:1px solid #ddd;
+         padding:0;margin:0;break-inside:avoid;page-break-inside:avoid}
+  .dgroup{display:block !important;margin:11pt 0 2pt;padding:0 0 2pt;
+          border-bottom:1.5pt solid #000;break-after:avoid}
+  .dgroup b{font-family:var(--serif);font-size:12pt}
+  .dgroup span{font-size:9pt;margin-left:6pt}
+  .dctop{display:block;padding:6pt 0 0}
+  .dcdate{font-size:11pt}
+  .dcw{font-size:10pt;margin-left:3pt}
   .dcity{background:none !important;color:#000 !important;border:1px solid #666;
          border-radius:0;padding:0 4pt;margin:0 5pt}
-  .dbody{padding:0 0 7pt}
-  .dplan{padding:4pt 0 0;font-size:10pt}
+  .dctitle{display:block;font-size:10.5pt;margin:1pt 0 0}
+  .dcrule{display:none}
+  .dplan{padding:3pt 0 6pt;font-size:10pt}
   .dnote,.dopt{background:#f4f4f4 !important;border-left:2pt solid #666;
                margin-top:5pt;padding:5pt 7pt;font-size:9.5pt;break-inside:avoid}
   .dopt ul{padding-left:13pt}
@@ -373,9 +426,10 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
 
 <section class="panel on" id="p-plan" role="tabpanel" aria-labelledby="t-plan">
   <p class="eyebrow">Itinerary</p><h2>날짜별 일정</h2>
-  <div class="chips" id="daychips" role="group" aria-label="도시별 보기"></div>
+  <div class="drail" id="drail" role="group" aria-label="날짜 바로가기"></div>
   <div id="days"></div>
-  <p class="tip">날짜를 누르면 그날 일정과 관광지 정보가 펼쳐집니다. 사진은 <code>photos</code> 폴더에 넣은 파일이 자동으로 표시됩니다.</p>
+  <div class="dnav" id="dnav"></div>
+  <p class="tip">위의 날짜 줄에서 하루를 고릅니다. 화면에는 고른 하루만 나오니 아래로 길게 내릴 일이 없습니다. 아래 <b>앞날·다음날</b> 버튼으로도 넘길 수 있습니다. 인쇄하면 열다섯 날이 모두 나옵니다. 사진은 <code>photos</code> 폴더에 넣은 파일이 자동으로 표시됩니다.</p>
 </section>
 
 <section class="panel" id="p-map" role="tabpanel" aria-labelledby="t-map">
@@ -769,45 +823,120 @@ async function commons(id,limit){
 }
 
 const nowKey=(new Date().getMonth()+1)+'/'+new Date().getDate();
-let todayScrolled=false;
+/* 도시 덩어리 머리에 붙일 숙박 문구. 새 데이터를 만들지 않고 STAYS 의 nights 를 그대로 쓴다. */
+const STAYBY=Object.fromEntries(STAYS.map(s=>[s.city,s.nights]));
+/* 같은 도시가 이어지는 구간만 한 덩어리로 묶는다. 이동·도착은 머리 없이 한 줄로 둔다. */
+function dayGroups(){
+  const out=[];
+  DAYS.forEach(d=>{
+    const last=out[out.length-1];
+    if(last&&last.c===d.c) last.days.push(d); else out.push({c:d.c,days:[d]});
+  });
+  return out;
+}
 function spotCard(id){
   const L=byId[id]||{n:id};
   return '<div class="scard" data-id="'+id+'"><div class="sph" data-ph="'+id+'">불러오는 중</div>'+
          '<div class="sbody"><b>'+L.n+'</b><span>'+(SINFO[id]||'')+'</span></div></div>';
 }
-function renderDays(filter){
-  const list = filter&&filter!=='전체' ? DAYS.filter(d=>d.c===filter) : DAYS;
-  document.getElementById('days').innerHTML = list.map((d,i)=>
-   '<div class="drow'+(d.d===nowKey?' today':'')+'">'+
-     '<button type="button" class="dhead" aria-expanded="false" aria-controls="db'+i+'">'+
-       '<span class="ddate">'+d.d+' '+d.w+'</span>'+
-       '<span class="dcity'+(d.c==='이동'?' move':'')+'">'+d.c+'</span>'+
-       '<span class="dtitle">'+d.t+'</span>'+
-       '<span class="caret" aria-hidden="true"><svg viewBox="0 0 24 24"><path d="M9 5l7 7-7 7"/></svg></span></button>'+
-     '<div class="dbody" id="db'+i+'"><p class="dplan">'+d.plan+'</p>'+
-       (d.note.length?'<div class="dnote"><b>'+d.note[0]+'</b><span>'+d.note[1]+'</span></div>':'')+
-       (d.opt&&d.opt.length?'<div class="dopt"><b>여유 옵션</b><ul>'+
-          d.opt.map(o=>'<li>'+o+'</li>').join('')+'</ul></div>':'')+
-       (d.spots.length>1&&!d.alt?'<button type="button" class="droute" data-d="'+d.d+'">'+
-          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18h4l8-12h4"/><circle cx="4" cy="18" r="2"/><circle cx="20" cy="6" r="2"/></svg>'+
-          '이 날 동선 지도에서 보기</button>':'')+
-       (d.spots.length?'<div class="scards">'+d.spots.map(spotCard).join('')+'</div>':'')+
-     '</div></div>').join('');
-  document.querySelectorAll('.dhead').forEach(h=>h.addEventListener('click',()=>{
-    const r=h.parentElement, open=r.classList.toggle('open');
-    h.setAttribute('aria-expanded',open?'true':'false');
-    if(open) r.querySelectorAll('.sph').forEach(fillThumb);
-  }));
-  /* 오늘 날짜는 필터를 바꿔도 계속 펼쳐 둔다 */
-  document.querySelectorAll('.drow.today .dhead').forEach(h=>h.click());
-  /* 여행 중이라면 오늘 줄이 보이도록 처음 한 번 내려 준다. 2/13 쯤이면 목록
-     한참 아래라 매번 손으로 찾아 내려가야 한다. */
-  if(!todayScrolled){
-    const t=document.querySelector('.drow.today');
-    if(t){ todayScrolled=true;
-      requestAnimationFrame(()=>t.scrollIntoView({block:'start',behavior:'smooth'})); }
-  }
+function dayCard(d,i){
+  return '<article class="dcard" data-d="'+d.d+'" id="dc'+i+'">'+
+     '<div class="dctop"><span class="dcdate">'+d.d+'</span><span class="dcw">'+d.w+'</span>'+
+       '<span class="dcity'+(d.c==='이동'?' move':'')+'">'+d.c+'</span></div>'+
+     '<h3 class="dctitle">'+d.t+'</h3><div class="dcrule"></div>'+
+     '<p class="dplan">'+d.plan+'</p>'+
+     (d.note.length?'<div class="dnote"><b>'+d.note[0]+'</b><span>'+d.note[1]+'</span></div>':'')+
+     (d.opt&&d.opt.length?'<div class="dopt"><b>여유 옵션</b><ul>'+
+        d.opt.map(o=>'<li>'+o+'</li>').join('')+'</ul></div>':'')+
+     (d.spots.length>1&&!d.alt?'<button type="button" class="droute" data-d="'+d.d+'">'+
+        '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18h4l8-12h4"/><circle cx="4" cy="18" r="2"/><circle cx="20" cy="6" r="2"/></svg>'+
+        '이 날 동선 지도에서 보기</button>':'')+
+     (d.spots.length?'<div class="scards">'+d.spots.map(spotCard).join('')+'</div>':'')+
+   '</article>';
 }
+/* 헤더와 리본이 sticky 로 겹쳐 있으니 그 높이만큼 덜 내려야 날짜 줄이 가려지지 않는다.
+   scrollIntoView 는 쓰지 않는다 — 가로 스크롤까지 함께 움직여 화면이 튄다. */
+function stickyTop(){
+  const navH=window.matchMedia('(min-width:900px)').matches?58:0;
+  const rl=document.getElementById('drail');
+  return navH+Math.max(rl?rl.offsetHeight:0,72);
+}
+const REDUCE=window.matchMedia('(prefers-reduced-motion:reduce)').matches;
+/* behavior:'smooth' 가 조용히 무시되는 환경이 있다(일부 웹뷰·프리렌더 상태).
+   오류도 안 내고 그냥 안 움직이므로 "부르면 된다"고 믿을 수 없다. 시도해 보고
+   200ms 뒤 한 픽셀도 안 움직였으면 no-op 으로 보고 즉시 대입으로 되돌린다.
+   움직이는 중이면 건드리지 않는다 — 진행 중인 애니메이션을 끊지 않기 위해. */
+function glide(get,set,to){
+  const from=get();
+  if(Math.abs(to-from)<=2) return;
+  set(to,true);
+  setTimeout(()=>{ if(get()===from) set(to,false); },200);
+}
+function glideX(el,left){
+  const max=Math.max(0,el.scrollWidth-el.clientWidth);
+  glide(()=>el.scrollLeft,(v,smooth)=>{
+    if(smooth&&!REDUCE){ try{ el.scrollTo({left:v,behavior:'smooth'}); return; }catch(e){} }
+    el.scrollLeft=v;
+  },Math.min(max,Math.max(0,left)));
+}
+function glideY(y){
+  glide(()=>window.scrollY,(v,smooth)=>{
+    if(smooth&&!REDUCE){ try{ window.scrollTo({top:v,behavior:'smooth'}); return; }catch(e){} }
+    window.scrollTo(0,v);
+  },Math.max(0,y));
+}
+let curDay=null;
+/* 고른 하루만 화면에 둔다. 나머지 열네 장은 DOM 에 남아 있고 인쇄에서만 나온다. */
+function selectDay(dateStr,scroll){
+  const card=document.querySelector('.dcard[data-d="'+dateStr+'"]');
+  if(!card) return;
+  document.querySelectorAll('.dcard.on').forEach(c=>c.classList.remove('on'));
+  card.classList.add('on');
+  curDay=dateStr;
+  card.querySelectorAll('.sph').forEach(fillThumb);
+  syncRail(); syncNav();
+  if(scroll) glideY(card.getBoundingClientRect().top+window.scrollY-stickyTop()-10);
+}
+/* 리본에서 고른 날을 표시하고, 그 알약이 화면 안에 들어오게 옆으로 굴린다 */
+function syncRail(){
+  const rail=document.getElementById('drail');
+  document.querySelectorAll('#drail .dpill').forEach(p=>{
+    const on=p.dataset.d===curDay;
+    p.classList.toggle('on',on); p.setAttribute('aria-pressed',on?'true':'false');
+    if(on&&rail) glideX(rail,
+      p.getBoundingClientRect().left-rail.getBoundingClientRect().left
+      +rail.scrollLeft-(rail.clientWidth-p.offsetWidth)/2);
+  });
+}
+function syncNav(){
+  const i=DAYS.findIndex(d=>d.d===curDay);
+  const prev=DAYS[i-1], next=DAYS[i+1];
+  const pb=document.querySelector('#dnav .dprev'), nb=document.querySelector('#dnav .dnext');
+  if(!pb||!nb) return;
+  pb.disabled=!prev; nb.disabled=!next;
+  pb.querySelector('.dk').textContent=prev?prev.d+' '+prev.w:'첫날';
+  nb.querySelector('.dk').textContent=next?next.d+' '+next.w:'마지막 날';
+  pb.setAttribute('aria-label',prev?prev.d+' '+prev.w+' 일정 보기':'앞날이 없습니다');
+  nb.setAttribute('aria-label',next?next.d+' '+next.w+' 일정 보기':'다음날이 없습니다');
+  pb.dataset.d=prev?prev.d:''; nb.dataset.d=next?next.d:'';
+}
+function renderDays(){
+  let i=0;
+  /* 도시 머리는 화면에서 감춰 두고 인쇄에서만 쓴다 — 리본이 화면에서 같은 일을 한다 */
+  document.getElementById('days').innerHTML = dayGroups().map(g=>
+    '<div class="dgroup"><b>'+g.c+'</b><span>'+(STAYBY[g.c]||'')+'</span></div>'+
+    g.days.map(d=>dayCard(d,i++)).join('')).join('');
+  document.getElementById('dnav').innerHTML =
+    '<button type="button" class="dprev"><span aria-hidden="true">←</span>'+
+      '<span class="dk"></span></button>'+
+    '<button type="button" class="dnext"><span class="dk"></span>'+
+      '<span aria-hidden="true">→</span></button>';
+  document.querySelectorAll('#dnav button').forEach(b=>b.addEventListener('click',()=>{
+    if(b.dataset.d) selectDay(b.dataset.d,true);
+  }));
+  selectDay(DAYS.some(d=>d.d===nowKey)?nowKey:DAYS[0].d,false);
+}
+
 async function fillThumb(el){
   if(el.dataset.done) return; el.dataset.done='1';
   const id=el.dataset.ph;
@@ -824,16 +953,20 @@ async function firstPhoto(id){
   const c=await commons(id,1);
   return c.length?c[0].src:null;
 }
-const DCHIPS=['전체','바르셀로나','파리','인터라켄','피렌체','로마','이동'];
-document.getElementById('daychips').innerHTML=DCHIPS.map((c,i)=>
-  '<button type="button" class="chip'+(i===0?' on':'')+'" aria-pressed="'+(i===0)+'" data-d="'+c+'">'+c+'</button>').join('');
-document.querySelectorAll('#daychips .chip').forEach(ch=>ch.addEventListener('click',()=>{
-  document.querySelectorAll('#daychips .chip').forEach(x=>{
-    x.classList.remove('on'); x.setAttribute('aria-pressed','false');
-  });
-  ch.classList.add('on'); ch.setAttribute('aria-pressed','true'); renderDays(ch.dataset.d);
-}));
-renderDays('전체');
+/* 여행 리본 — 도시 덩어리마다 그 도시의 날짜를 얹는다. 15줄을 훑는 대신 여기서 고른다.
+   선택자는 #drail 안으로 좁힌다. 지도 탭 칩과 클래스가 섞이지 않게. */
+const railEl=document.getElementById('drail');
+const nightsOf = c => ((STAYBY[c]||'').split('· ')[1]||'');
+railEl.innerHTML=dayGroups().map(g=>
+  '<div class="dgrp'+(g.c==='이동'||g.c==='도착'?' move':'')+'">'+
+  '<span class="dglab">'+g.c+(nightsOf(g.c)?' <i>'+nightsOf(g.c)+'</i>':'')+'</span>'+
+  '<span class="dgp">'+g.days.map(d=>
+    '<button type="button" class="dpill'+(d.d===nowKey?' today':'')+'" data-d="'+d.d+'" '+
+    'aria-pressed="false" aria-label="'+d.d+' '+d.w+' '+d.t+'"><b>'+d.d+'</b>'+
+    '<span>'+d.w+'</span></button>').join('')+'</span></div>').join('');
+document.querySelectorAll('#drail .dpill').forEach(p=>
+  p.addEventListener('click',()=>selectDay(p.dataset.d,true)));
+renderDays();
 
 const lb=document.getElementById('lb'),lbt=document.getElementById('lbt'),lbb=document.getElementById('lbb');
 /* 같은 경로를 여러 번 확인하지 않도록 결과를 기억해 둔다.
@@ -921,7 +1054,7 @@ function closeLb(){
 document.addEventListener('click',e=>{
   const sm=e.target.closest('.smapbtn');
   if(sm){ const im=sm.querySelector('.smap');
-          lbb.innerHTML='<img src="'+im.src+'" alt="'+im.alt+'" style="width:100%;border-radius:8px;margin-top:14px;background:#fff">';
+          lbb.innerHTML='<img src="'+im.src+'" alt="'+im.alt+'" style="width:100%;border-radius:2px;margin-top:14px;background:#fff">';
           openLb(im.alt.split(' — ')[0]); return; }
   const dr=e.target.closest('.droute');
   if(dr){ showDayRoute(dr.dataset.d); return; }
@@ -1015,9 +1148,13 @@ function showTab(t){
   const prev=document.querySelector('.panel.on');
   if(prev) scrollMemo[prev.id]=window.scrollY;
   document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on',x.id==='p-'+t));
+  /* 일정 탭에서만 헤더의 sticky 를 푼다. 헤더 97px + 리본 + 하단 탭이 겹치면
+     모바일 화면의 3분의 1이 고정 영역이 된다. 리본만 남긴다. */
+  document.body.classList.toggle('plantab',t==='plan');
   window.scrollTo({top:scrollMemo['p-'+t]||0});
   if(t==='map'&&map) fitWhenSized();
 }
+document.body.classList.add('plantab');   // 첫 화면이 일정 탭이다
 const navBtns=[...document.querySelectorAll('nav button')];
 navBtns.forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.t)));
 /* tablist 는 좌우 화살표로 옮겨 다닐 수 있어야 한다 */
