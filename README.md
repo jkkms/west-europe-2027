@@ -12,6 +12,8 @@ app.html        옛 주소. index.html 로 넘겨주기만 함 (이미 공유한
 photos/         관광지 사진. {아이디}-{1~6}.jpg|jpeg|png|webp
 seats/          항공 좌석 배치도
 CLAUDE.md       인수인계 문서 — 확정 사실, 설계 근거, 재구축 사양
+DESIGN-BRIEF.md 디자인 개선을 맡길 때 넘기는 의뢰서
+tools/          sw-test.js(오프라인 검증), mkicon.py(아이콘 생성)
 ```
 
 GitHub Pages(`main` / root)로 배포됩니다. `index.html`을 고쳐서 push하면 1~2분 뒤 반영됩니다.
