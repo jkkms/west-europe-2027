@@ -87,6 +87,23 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .bbar i{display:block;height:100%;width:0;background:var(--alpine);border-radius:99px;
         transition:width .25s}
 #bcount{font-family:var(--mono);font-size:11.5px;color:var(--slate);flex:0 0 auto}
+.legs{margin-top:12px;background:var(--card);border:1px solid var(--frost);border-radius:10px;
+       padding:6px 12px 12px}
+.legs[hidden]{display:none}
+.leg{display:flex;align-items:center;gap:10px;padding:9px 0;border-bottom:1px solid var(--soft);
+     font-size:13px}
+.leg:last-of-type{border-bottom:0}
+.lgn{flex:0 0 auto;font-family:var(--mono);font-size:10.5px;color:var(--ember);
+     background:var(--emberbg);border-radius:99px;padding:2px 7px}
+.lgt{flex:1;min-width:0;line-height:1.45}
+.lgd{flex:0 0 auto;font-family:var(--mono);font-size:11.5px;color:var(--slate)}
+.lgb{flex:0 0 auto;font-family:var(--mono);font-size:11px;color:var(--deep);text-decoration:none;
+     border:1px solid var(--frost);border-radius:99px;padding:4px 9px}
+.lgb:hover{border-color:var(--alpine);color:var(--alpine)}
+.lgall{display:block;margin-top:10px;padding:10px;text-align:center;font-family:var(--mono);
+       font-size:12px;color:var(--deep);text-decoration:none;background:var(--soft);border-radius:8px}
+.lgall:hover{color:var(--alpine)}
+.lgnote{margin:9px 0 0;font-size:11.5px;color:var(--slate);line-height:1.6}
 .rnum{width:21px;height:21px;border-radius:50%;background:var(--ember);color:#fff;
       font-family:var(--mono);font-size:11px;font-weight:500;line-height:21px;text-align:center;
       box-shadow:0 1px 4px rgba(16,24,33,.4)}
@@ -289,7 +306,7 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
      · Chromium 은 flex 안에서 break-inside:avoid 를 무시 → 행을 display:table 로
    ───────────────────────────────────────────────────────────── */
 @media print{
-  nav,#p-map,.chips,.tip,.toast,.lb,.caret,.droute,.scards,.bprog,.printbtn,
+  nav,#p-map,.chips,.tip,.toast,.lb,.caret,.droute,.scards,.bprog,.printbtn,.legs,
   .count,.eyebrow,.seatbox,.csite{display:none !important}
   :root{--ink:#000;--slate:#333;--paper:#fff;--card:#fff;--frost:#bbb;--soft:#f2f2f2;
         --alpine:#000;--deep:#000;--ember:#000;--emberbg:#f2f2f2;--moss:#000;--mossbg:#f2f2f2}
@@ -360,6 +377,7 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
     <span id="routetxt"></span>
     <button type="button" id="routeclear">지우기</button>
   </div>
+  <div class="legs" id="legs" hidden></div>
   <div id="map"></div>
   <div class="mlegend">
     <span><i style="border-color:var(--ember)"></i>공항</span>
@@ -838,6 +856,16 @@ async function _collectRaw(id){
 const gDir   = L => 'https://www.google.com/maps/dir/?api=1&destination='+L.lat+','+L.lng;
 const gPlace = L => 'https://www.google.com/maps/search/?api=1&query='+
                     encodeURIComponent(L.q || (L.lat+','+L.lng));
+/* 구간별 대중교통 길찾기. 앱에서 소요시간을 직접 계산하려면 Directions API 키(결제
+   등록)가 필요하고, 2027년 2월 시각표는 지금 알 수도 없다. 대신 구글 지도로 넘겨
+   현지에서 실시간 시각표를 보게 한다. api=1 규격이라 키가 필요 없다. */
+const gTransit = (a,b) => 'https://www.google.com/maps/dir/?api=1&travelmode=transit'+
+  '&origin='+a.lat+','+a.lng+'&destination='+b.lat+','+b.lng;
+/* 하루 전체를 경유지로 묶어 한 번에 연다 (경유지는 9곳까지) */
+const gDayPath = stops => 'https://www.google.com/maps/dir/?api=1&travelmode=transit'+
+  '&origin='+stops[0].lat+','+stops[0].lng+
+  '&destination='+stops[stops.length-1].lat+','+stops[stops.length-1].lng+
+  (stops.length>2 ? '&waypoints='+stops.slice(1,-1).map(l=>l.lat+','+l.lng).join('|') : '');
 const gArea  = (lat,lng,z) => 'https://www.google.com/maps/@?api=1&map_action=map&center='+
                     lat+','+lng+'&zoom='+z;
 
@@ -1056,6 +1084,34 @@ function clearRoute(){
   if(routeLine&&map){ map.removeLayer(routeLine); }
   routeLine=null;
   const b=document.getElementById('routebar'); if(b) b.hidden=true;
+  const g=document.getElementById('legs'); if(g){ g.hidden=true; g.innerHTML=''; }
+}
+/* 직선거리. 실제 걷는 거리나 대중교통 시간은 아니라서 화면에도 그렇게 적는다. */
+function km(a,b){
+  const R=6371, r=Math.PI/180;
+  const h=Math.sin((b.lat-a.lat)*r/2)**2+
+          Math.cos(a.lat*r)*Math.cos(b.lat*r)*Math.sin((b.lng-a.lng)*r/2)**2;
+  return 2*R*Math.asin(Math.sqrt(h));
+}
+function legRow(from,to,label){
+  const d=km(from,to);
+  return '<div class="leg"><span class="lgn">'+label+'</span>'+
+    '<span class="lgt">'+from.n+' → '+to.n+'</span>'+
+    '<span class="lgd">'+(d<1?Math.round(d*1000)+'m':d.toFixed(1)+'km')+'</span>'+
+    '<a class="lgb" href="'+gTransit(from,to)+'" target="_blank" rel="noopener">대중교통</a></div>';
+}
+function drawLegs(d,stops){
+  const g=document.getElementById('legs'); if(!g) return;
+  let html='';
+  /* 그날 도시에 숙소가 있으면 숙소에서 첫 장소까지도 넣는다 — 실제 하루는 거기서 시작한다 */
+  const stay=ALL.find(l=>l.t==='stay'&&l.c===d.c);
+  if(stay) html+=legRow(stay,stops[0],'숙소');
+  for(let i=0;i<stops.length-1;i++) html+=legRow(stops[i],stops[i+1],(i+1)+'→'+(i+2));
+  html+='<a class="lgall" href="'+gDayPath(stops)+'" target="_blank" rel="noopener">'+
+        '구글 지도에서 이 날 전체 경로 열기 ↗</a>'+
+        '<p class="lgnote">거리는 <b>직선거리</b>입니다. 실제 소요시간은 '+
+        '<b>대중교통</b>을 누르면 구글 지도에서 그때의 시각표로 나옵니다.</p>';
+  g.innerHTML=html; g.hidden=false;
 }
 function showDayRoute(dateStr){
   const d=DAYS.find(x=>x.d===dateStr);
@@ -1090,6 +1146,7 @@ function showDayRoute(dateStr){
     document.getElementById('routetxt').textContent=
       d.d+' '+d.w+' · '+d.t+' — 방문 순서 '+d.spots.length+'곳';
     b.hidden=false;
+    drawLegs(d,stops);
   });
 }
 function focusOn(id){
