@@ -117,6 +117,7 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 #map.nightmap .leaflet-tile-pane{filter:invert(1) hue-rotate(180deg) brightness(.92) contrast(.88) saturate(.65)}
 .leaflet-popup-content{margin:11px 13px;font-size:14px}
 .leaflet-popup-content b{font-family:var(--serif);font-size:15px;display:block;margin-bottom:5px}
+.leaflet-popup-content .pnote{display:block;font-size:12px;color:var(--slate);line-height:1.55;margin-bottom:7px}
 .leaflet-popup-content a,.leaflet-popup-content button{font-family:var(--mono);font-size:12px;color:var(--alpine);text-decoration:none;background:none;border:0;padding:0;cursor:pointer;margin-right:10px}
 .mlegend{display:flex;flex-wrap:wrap;gap:10px 16px;padding:12px 2px 0;font-family:var(--mono);font-size:11.5px;color:var(--slate)}
 .mlegend i{display:inline-block;width:10px;height:10px;border-radius:50%;border:2.5px solid;margin-right:5px;vertical-align:-1px}
@@ -370,7 +371,7 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
     <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.3 7-11a7 7 0 1 0-14 0c0 4.7 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
     <span>구글 지도에서 이 지역 열기</span></a>
   <p class="tip" id="tilenote" hidden>기본 지도 서버에 연결하지 못해 예비 지도로 전환했습니다. 라벨이 조금 적지만 위치와 기능은 동일합니다.</p>
-  <p class="tip">핀을 누르면 <b>구글 지도</b>·길찾기·사진이 나옵니다. 휴대폰에 구글 지도 앱이 있으면 앱으로 열립니다. <b>숙소는 아직 비어 있습니다.</b> 파일 안의 <code>STAYS</code> 목록에 이름과 좌표를 넣으면 보라색 핀으로 표시됩니다.</p>
+  <p class="tip">핀을 누르면 <b>구글 지도</b>·길찾기·사진이 나옵니다. 휴대폰에 구글 지도 앱이 있으면 앱으로 열립니다. <b>보라색 핀이 숙소</b>입니다. 누르면 예약 페이지와 길찾기가 나옵니다. 에어비앤비 네 곳은 체크인 전까지 정확한 주소가 공개되지 않아 <b>대략 위치</b>로 찍혀 있으니, 실제 문 앞은 예약 확인 메일의 주소를 보세요.</p>
 </section>
 
 <section class="panel" id="p-fly" role="tabpanel" aria-labelledby="t-fly">
@@ -465,9 +466,32 @@ const PHOTOS = {
   // sagrada: ['photos/sagrada-a.jpg'],
 };
 
-/* 숙소 — 정해지면 여기에 추가하면 지도에 보라색 핀으로 나옵니다 */
+/* 숙소 — 지도에 보라색 핀으로 표시됩니다.
+   approx:true 는 에어비앤비가 공개하는 대략 위치라는 뜻입니다. 에어비앤비는
+   체크인 전까지 정확한 주소를 감추고 근처 한 점만 보여주므로, 실제 문 앞은
+   예약 확인 메일의 주소를 보셔야 합니다. 피렌체만 실제 호텔 주소 좌표입니다.
+   주소창의 추적용 꼬리표(source_impression_id 등)는 떼고 넣었습니다. */
 const STAYS = [
-  // {city:'바르셀로나', name:'호텔 이름', lat:41.3874, lng:2.1686},
+ {city:'바르셀로나', name:'산츠역 로브레뇨 33', lat:41.3817, lng:2.1378, approx:true,
+  nights:'2/3~2/6 · 3박',
+  info:'산츠역에서 350m. 2/6 아침 09:26 파리행 기차를 타기에 더없이 좋은 자리입니다. 다만 관광지(카사 바트요 2.5km)와는 떨어져 있어 매일 지하철을 탑니다',
+  url:'https://www.airbnb.co.kr/rooms/11737208'},
+ {city:'파리', name:'노치치 컬렉션 · 생토노레 III', lat:48.8698, lng:2.3207, approx:true,
+  nights:'2/6~2/9 · 3박',
+  info:'1구 생토노레. 오르세 1.2km, 루브르 1.6km 라 2/7·2/8 일정이 걸어서 닿습니다',
+  url:'https://www.airbnb.co.kr/rooms/1453760355803553379'},
+ {city:'인터라켄', name:'HEART3', lat:46.6844, lng:7.8553, approx:true,
+  nights:'2/9~2/12 · 3박',
+  info:'인터라켄 중심가. 융프라우행 기차가 서는 오스트역까지 1.2km 이니 아침에 시간을 넉넉히 잡으세요',
+  url:'https://www.airbnb.co.kr/rooms/19632116'},
+ {city:'피렌체', name:'FH55 그랜드 호텔 메디테라네오', lat:43.76619, lng:11.27226,
+  nights:'2/12~2/14 · 2박',
+  info:'아르노 강변 룽가르노 델 템피오 44. 미켈란젤로 광장 700m, 두오모 1.5km, SMN역 2.3km',
+  url:'https://kr.trip.com/hotels/w/detail/?cityid=687&hotelid=771618&curr=KRW&locale=ko-KR'},
+ {city:'로마', name:'로마 도심 산책', lat:41.8982, lng:12.4903, approx:true,
+  nights:'2/14~2/16 · 2박',
+  info:'트레비 650m, 콜로세움 900m, 테르미니역 1km. 2/16 공항 직통열차를 타기도 좋습니다',
+  url:'https://www.airbnb.co.kr/rooms/947880985272272074'}
 ];
 
 const LOC=[
@@ -564,7 +588,7 @@ const SINFO={
 /* opt = 여유 옵션. 시간이 남을 때만 가는 곳이라 확정 일정과 구분해 표시한다. */
 const DAYS=[
  {d:'2/3',w:'수',c:'바르셀로나',t:'인천 출발 · 저녁 도착',
-  plan:'11:30 인천 T1에서 TW0407 출발, 14시간 55분 비행. 18:25 바르셀로나 엘프라트 T2 도착 후 호텔 체크인하고 휴식합니다.',
+  plan:'11:30 인천 T1에서 TW0407 출발, 14시간 55분 비행. 18:25 바르셀로나 엘프라트 T2 도착 후 숙소(산츠역 옆)로 이동해 체크인하고 휴식합니다.',
   spots:[],note:['이동','첫날은 이동만 합니다. 시차 적응을 위해 무리하지 마세요.']},
  {d:'2/4',w:'목',c:'바르셀로나',t:'가우디의 북쪽',
   plan:'사그라다 파밀리아 → 가우디 거리를 따라 산 파우 병원 → 오후 구엘 공원.',
@@ -575,7 +599,7 @@ const DAYS=[
   plan:'오전 팔라우 데 라 무지카 가이드투어 → 피카소 미술관 → 고딕지구와 보케리아 시장 → 카사 바트요 내부 관람.',
   spots:['palau','picasso','batllo'],
   note:['예약','팔라우는 가이드투어로만 들어갈 수 있어 오전 투어를 미리 잡아야 합니다. 피카소 미술관은 무료 시간대라도 온라인 예약이 필요하고 월요일 휴관인데 오늘은 금요일이라 열립니다. 카사 바트요도 시간 지정 예약입니다.'],
-  opt:['보케리아 시장 — 팔라우에서 도보 10분. 일요일 휴무라 금요일인 오늘이 적기입니다','카사 밀라(라 페드레라) 외관 — 카사 바트요에서 그라시아 거리를 따라 도보 6분','저녁 몬주익 야경 — 산츠역 방향이라 내일 아침 기차 타기 전날 동선으로 좋습니다']},
+  opt:['보케리아 시장 — 팔라우에서 도보 10분. 일요일 휴무라 금요일인 오늘이 적기입니다','카사 밀라(라 페드레라) 외관 — 카사 바트요에서 그라시아 거리를 따라 도보 6분','저녁 몬주익 야경 — 숙소(산츠역 옆)와 같은 방향이라 돌아가는 길에 들르기 좋습니다']},
  {d:'2/6',w:'토',c:'이동',t:'바르셀로나 → 파리',
   plan:'09:26 산츠역 출발, 직행 TGV로 16:12 파리 리옹역 도착. 6시간 46분이 걸립니다. 체크인하고 휴식합니다.',
   spots:['sants','lyon'],note:['예약','직행 TGV는 하루 몇 편뿐이라 미리 예약해야 합니다.'],
@@ -602,7 +626,7 @@ const DAYS=[
  {d:'2/12',w:'금',c:'이동',t:'인터라켄 → 피렌체',
   plan:'밀라노 경유로 약 7시간, 종일 이동. 도착 후 휴식합니다.',
   spots:['smn'],note:['이동','가장 긴 이동 구간입니다. 아침 일찍보다 여유 있게 출발하세요.'],
-  opt:['두오모 야경과 베키오 다리 산책 — 숙소가 두오모 근처일 때만']},
+  opt:['두오모 야경과 베키오 다리 산책 — 숙소에서 두오모까지 1.5km 입니다. 7시간 이동한 날이니 무리하지 마시고, 대신 숙소 앞 아르노 강변만 걸어도 좋습니다']},
  {d:'2/13',w:'토',c:'피렌체',t:'르네상스 하루',
   plan:'오전 우피치 미술관 → 두오모 내부 → 해질녘 미켈란젤로 광장.',
   spots:['uffizi','duomo','michelangelo'],
@@ -617,7 +641,7 @@ const DAYS=[
   spots:['vatican','stpeter'],note:['동선','박물관과 대성당은 입구가 달라 도보 10분을 돌아가야 합니다. 산탄젤로 성은 월요일 휴관이라 오늘은 못 가고 내일로 뒀습니다.']},
  {d:'2/16',w:'화',c:'로마',t:'고대 로마 · 귀국',
   plan:'오전 콜로세움과 포로 로마노 → 15:00쯤 시내 출발 → 19:00 피우미치노 T3에서 TW0406 출발.',
-  spots:['colosseo','fco'],note:['출발','19:00 출발이라 공항에 16:00까지 도착해야 합니다. 오전과 이른 오후만 쓸 수 있으니 짐은 호텔에 맡기고 다니세요.'],
+  spots:['colosseo','fco'],note:['출발','19:00 출발이라 공항에 16:00까지 도착해야 합니다. 오전과 이른 오후만 쓸 수 있으니 짐은 숙소에 맡기고 다니세요. 숙소에서 테르미니역까지 1km 라 공항 직통열차를 타기 좋습니다.'],
   opt:['스페인 광장 — 콜로세움에서 2.0km. 시내 방향이라 15:00 출발에 무리가 없습니다. 둘 중에는 이쪽을 권합니다','산탄젤로 성 — 2.6km인 데다 어제 간 바티칸 옆으로 되돌아가는 셈입니다. 월요일 휴관이라 어제 못 붙였을 뿐이니, 오전이 아주 일찍 끝났을 때만 고르세요','콜로세움과 포로 로마노가 예상보다 오래 걸리면 옵션은 포기하고 공항으로 향하세요']},
  {d:'2/17',w:'수',c:'도착',t:'인천 도착',
   plan:'14:50 인천 T1 도착으로 13박 15일 일정이 끝납니다.',
@@ -684,7 +708,10 @@ const TODOS=[
   site:'jungfrau.ch', url:'https://www.jungfrau.ch/en-gb/jungfraujoch-top-of-europe/'}
 ];
 
-const ALL = LOC.concat(STAYS.map((s,i)=>({c:s.city,t:'stay',id:'stay'+i,n:s.name,lat:s.lat,lng:s.lng})));
+const ALL = LOC.concat(STAYS.map((s,i)=>({c:s.city,t:'stay',id:'stay'+i,n:s.name,
+  lat:s.lat,lng:s.lng,url:s.url,approx:s.approx})));
+STAYS.forEach((s,i)=>{ SINFO['stay'+i]=s.nights+' · '+s.info
+  +(s.approx?' (에어비앤비 대략 위치)':''); });
 const byId = Object.fromEntries(ALL.map(l=>[l.id,l]));
 const EXT=['jpg','jpeg','png','webp'];
 /* 내 사진이 없을 때만 위키미디어 공용에서 자동으로 채웁니다. 끄려면 false */
@@ -1110,9 +1137,13 @@ window.addEventListener('load',()=>{
     const m=L.marker([l.lat,l.lng],{riseOnHover:true,icon:L.divIcon({className:'',
       html:'<div class="pin '+l.t+'">'+(ICON[l.t]||'★')+'</div>',iconSize:[26,26],iconAnchor:[13,13]}),title:l.n}).addTo(map);
     m.bindPopup('<b>'+l.n+'</b>'+
-      '<a href="'+gPlace(l)+'" target="_blank" rel="noopener">구글지도</a>'+
-      '<a href="'+gDir(l)+'" target="_blank" rel="noopener">길찾기</a>'+
-      '<button type="button" class="spot" data-id="'+l.id+'">사진</button>');
+      (l.t==='stay'
+        ? '<span class="pnote">'+SINFO[l.id]+'</span>'
+          +'<a href="'+l.url+'" target="_blank" rel="noopener">예약 확인</a>'
+          +'<a href="'+gDir(l)+'" target="_blank" rel="noopener">길찾기</a>'
+        : '<a href="'+gPlace(l)+'" target="_blank" rel="noopener">구글지도</a>'
+          +'<a href="'+gDir(l)+'" target="_blank" rel="noopener">길찾기</a>'
+          +'<button type="button" class="spot" data-id="'+l.id+'">사진</button>'));
     marks[l.id]=m;
   });
   document.getElementById('chips').innerHTML=CITY_NAMES.map((c,i)=>
