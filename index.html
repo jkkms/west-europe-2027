@@ -90,6 +90,7 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .scards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:14px}
 .scard{background:var(--soft);border-radius:10px;overflow:hidden;border:1px solid var(--frost)}
 .sthumb{width:100%;aspect-ratio:3/2;object-fit:cover;display:block;background:var(--soft)}
+.sph-none{color:var(--frost)}
 .sph{width:100%;aspect-ratio:3/2;display:flex;align-items:center;justify-content:center;font-family:var(--mono);font-size:10.5px;color:var(--slate);background:var(--soft)}
 .sbody{padding:11px 13px 13px}
 .sbody b{display:block;font-size:15px;font-weight:500;line-height:1.35}
@@ -198,6 +199,19 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
 
 @media (prefers-reduced-motion:reduce){
   *,*::before,*::after{transition-duration:.01ms !important;animation-duration:.01ms !important}
+}
+
+/* ── 아주 좁은 화면(아이폰 SE·구형 안드로이드) ── */
+@media (max-width:374px){
+  /* 날짜 열을 그대로 두면 항목 칸이 105px 로 눌려 예매처 도메인이 죄다 잘린다.
+     요일을 아랫줄로 내려 날짜 열을 줄이고, 칩 글자도 한 단계 작게 한다. */
+  .btab .c1{width:28px}
+  .btab .c2{width:104px}
+  .btab td{padding:11px 6px}
+  .bwhen{white-space:normal;line-height:1.5}
+  .bwhen .wd{display:block}
+  .csite{font-size:10px;padding:3px 7px;gap:4px}
+  .bname{font-size:13.5px}
 }
 
 /* ── 태블릿 ── */
@@ -628,6 +642,7 @@ async function commons(id,limit){
 }
 
 const nowKey=(new Date().getMonth()+1)+'/'+new Date().getDate();
+let todayScrolled=false;
 function spotCard(id){
   const L=byId[id]||{n:id};
   return '<div class="scard" data-id="'+id+'"><div class="sph" data-ph="'+id+'">불러오는 중</div>'+
@@ -658,11 +673,23 @@ function renderDays(filter){
   }));
   /* 오늘 날짜는 필터를 바꿔도 계속 펼쳐 둔다 */
   document.querySelectorAll('.drow.today .dhead').forEach(h=>h.click());
+  /* 여행 중이라면 오늘 줄이 보이도록 처음 한 번 내려 준다. 2/13 쯤이면 목록
+     한참 아래라 매번 손으로 찾아 내려가야 한다. */
+  if(!todayScrolled){
+    const t=document.querySelector('.drow.today');
+    if(t){ todayScrolled=true;
+      requestAnimationFrame(()=>t.scrollIntoView({block:'start',behavior:'smooth'})); }
+  }
 }
 async function fillThumb(el){
   if(el.dataset.done) return; el.dataset.done='1';
-  const id=el.dataset.ph, src=await firstPhoto(id);
-  if(src) el.outerHTML='<img class="sthumb" src="'+src+'" alt="" loading="lazy">';
+  const id=el.dataset.ph;
+  let src=null;
+  try{ src=await firstPhoto(id); }catch(e){}
+  if(src){ el.outerHTML='<img class="sthumb" src="'+src+'" alt="" loading="lazy">'; return; }
+  /* 못 찾았으면 문구를 바꾼다. 그냥 두면 오프라인일 때 "불러오는 중"이 영원히 남는다. */
+  el.textContent='사진 없음';
+  el.classList.add('sph-none');
 }
 async function firstPhoto(id){
   if(PHOTOS[id]&&PHOTOS[id].length) return PHOTOS[id][0];
