@@ -69,6 +69,24 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .dopt ul{margin:0;padding-left:17px}
 .dopt li{margin:4px 0}
 .dopt li::marker{color:var(--moss)}
+/* 이 날 동선 보기 */
+.droute{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+        margin-top:12px;padding:11px;background:var(--card);border:1px solid var(--frost);
+        border-radius:10px;color:var(--deep);font:inherit;font-size:13.5px;cursor:pointer}
+.droute svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;
+            stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.droute:hover{border-color:var(--alpine);color:var(--alpine)}
+.rnum{width:21px;height:21px;border-radius:50%;background:var(--ember);color:#fff;
+      font-family:var(--mono);font-size:11px;font-weight:500;line-height:21px;text-align:center;
+      box-shadow:0 1px 4px rgba(16,24,33,.4)}
+.routebar{display:flex;align-items:center;gap:12px;margin-bottom:10px;padding:10px 13px;
+          background:var(--emberbg);border-left:3px solid var(--ember);border-radius:0 8px 8px 0;
+          font-size:13px;line-height:1.5}
+.routebar[hidden]{display:none}
+.routebar span{flex:1}
+.routebar button{flex:0 0 auto;font-family:var(--mono);font-size:11.5px;color:var(--ember);
+                 background:none;border:1px solid currentColor;border-radius:99px;
+                 padding:4px 11px;cursor:pointer}
 .scards{display:grid;grid-template-columns:1fr;gap:12px;margin-top:14px}
 .scard{background:var(--soft);border-radius:10px;overflow:hidden;border:1px solid var(--frost)}
 .sthumb{width:100%;aspect-ratio:3/2;object-fit:cover;display:block;background:var(--soft)}
@@ -253,6 +271,10 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
 <section class="panel" id="p-map" role="tabpanel" aria-labelledby="t-map">
   <p class="eyebrow">Map</p><h2>지도</h2>
   <div class="chips" id="chips" role="group" aria-label="도시별 보기"></div>
+  <div class="routebar" id="routebar" hidden>
+    <span id="routetxt"></span>
+    <button type="button" id="routeclear">지우기</button>
+  </div>
   <div id="map"></div>
   <div class="mlegend">
     <span><i style="border-color:var(--ember)"></i>공항</span>
@@ -487,6 +509,7 @@ const DAYS=[
   spots:['jungfrau'],note:['날씨','흐리면 다음 날로 미루세요. 이틀 중 맑은 날을 고르라고 예비일을 뒀습니다.']},
  {d:'2/11',w:'목',c:'인터라켄',t:'예비일',
   plan:'그린델발트 피르스트 또는 라우터브루넨 계곡. 전날 융프라우를 못 갔다면 오늘 재시도합니다.',
+  alt:true,   // 셋 중 하나를 고르는 날이라 방문 "순서"가 없다 — 동선 선을 그리지 않는다
   spots:['first','lauter','jungfrau'],note:['운휴','하더쿨름과 쉬니게플라테는 겨울 운휴입니다.']},
  {d:'2/12',w:'금',c:'이동',t:'인터라켄 → 피렌체',
   plan:'밀라노 경유로 약 7시간, 종일 이동. 도착 후 휴식합니다.',
@@ -623,6 +646,9 @@ function renderDays(filter){
        (d.note.length?'<div class="dnote"><b>'+d.note[0]+'</b><span>'+d.note[1]+'</span></div>':'')+
        (d.opt&&d.opt.length?'<div class="dopt"><b>여유 옵션</b><ul>'+
           d.opt.map(o=>'<li>'+o+'</li>').join('')+'</ul></div>':'')+
+       (d.spots.length>1&&!d.alt?'<button type="button" class="droute" data-d="'+d.d+'">'+
+          '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 18h4l8-12h4"/><circle cx="4" cy="18" r="2"/><circle cx="20" cy="6" r="2"/></svg>'+
+          '이 날 동선 지도에서 보기</button>':'')+
        (d.spots.length?'<div class="scards">'+d.spots.map(spotCard).join('')+'</div>':'')+
      '</div></div>').join('');
   document.querySelectorAll('.dhead').forEach(h=>h.addEventListener('click',()=>{
@@ -694,18 +720,24 @@ function acts(L){
          '<button type="button" class="gomap" data-id="'+L.id+'">앱 지도에서 보기</button></div>';
 }
 let lastFocus=null;
+/* 지금 열려 있는 사진창을 가리키는 표. 사진을 불러오는 동안 창을 닫거나
+   다른 곳을 열면 늦게 도착한 결과가 남의 창을 덮어쓰던 문제를 막는다. */
+let lbToken=0;
 function openLb(title){
   lastFocus=document.activeElement;
   lbt.textContent=title; lb.hidden=false; document.body.style.overflow='hidden';
   lbt.focus();
+  return ++lbToken;
 }
 async function openSpot(id){
   const L=byId[id]; if(!L) return;
-  openLb(L.n);
+  const my=openLb(L.n);
   lbb.innerHTML=acts(L)+'<p class="pempty">사진 불러오는 중…</p>';
   let imgs=await collect(id), credit='';
+  if(my!==lbToken) return;   // 기다리는 사이에 창이 바뀌었다
   if(!imgs.length){
     const c=await commons(id,6);
+    if(my!==lbToken) return;
     imgs=c.map(x=>x.src);
     if(c.length) credit='<p class="pempty" style="font-size:11.5px">사진 출처 · 위키미디어 공용 — '
       + c.slice(0,3).map(x=>'<a href="'+x.page+'" target="_blank" rel="noopener" style="color:var(--deep)">'
@@ -717,6 +749,7 @@ async function openSpot(id){
     : '<p class="pempty">사진을 찾지 못했습니다. <code>photos</code> 폴더에 <code>'+id+'-1.jpg</code> 로 저장하면 표시됩니다.</p>');
 }
 function closeLb(){
+  lbToken++;                 // 아직 오는 중인 결과를 무효로 만든다
   lb.hidden=true; lbb.innerHTML=''; document.body.style.overflow='';
   if(lastFocus&&lastFocus.isConnected) lastFocus.focus();
   lastFocus=null;
@@ -726,12 +759,30 @@ document.addEventListener('click',e=>{
   if(sm){ const im=sm.querySelector('.smap');
           lbb.innerHTML='<img src="'+im.src+'" alt="'+im.alt+'" style="width:100%;border-radius:8px;margin-top:14px;background:#fff">';
           openLb(im.alt.split(' — ')[0]); return; }
+  const dr=e.target.closest('.droute');
+  if(dr){ showDayRoute(dr.dataset.d); return; }
+  if(e.target.closest('#routeclear')){ clearRoute(); return; }
   const g=e.target.closest('.gomap');
   if(g){const id=g.dataset.id;closeLb();showTab('map');focusOn(id);return;}
   const b=e.target.closest('.spot'); if(b){openSpot(b.dataset.id);return;}
   if(e.target===lb||e.target.closest('.lbx')) closeLb();
 });
-document.addEventListener('keydown',e=>{if(e.key==='Escape'&&!lb.hidden)closeLb();});
+document.addEventListener('keydown',e=>{
+  if(lb.hidden) return;
+  if(e.key==='Escape'){ closeLb(); return; }
+  /* 창이 떠 있는 동안 Tab 이 뒤 화면으로 새어 나가지 않도록 가둔다.
+     aria-modal 만으로는 키보드 초점이 막히지 않는다. */
+  if(e.key!=='Tab') return;
+  const f=[...lb.querySelectorAll('a[href],button:not([disabled]),[tabindex]:not([tabindex="-1"])')]
+          .filter(el=>el.offsetParent!==null);
+  if(!f.length) return;
+  const first=f[0], last=f[f.length-1];
+  if(e.shiftKey && (document.activeElement===first||document.activeElement===lbt)){
+    e.preventDefault(); last.focus();
+  }else if(!e.shiftKey && document.activeElement===last){
+    e.preventDefault(); first.focus();
+  }
+});
 
 /* 체크 상태는 순서가 아니라 항목 id 로 저장한다.
    순서로 저장하면 목록을 고칠 때마다 체크가 엉뚱한 줄로 옮겨간다.
@@ -781,16 +832,31 @@ document.querySelectorAll('.btab .bname').forEach(b=>b.addEventListener('click',
   det.hidden=!open;
 }));
 
+const scrollMemo={};
 function showTab(t){
   document.querySelectorAll('nav button').forEach(x=>{
     const on=x.dataset.t===t;
     x.classList.toggle('on',on); x.setAttribute('aria-selected',on?'true':'false');
   });
+  /* 보던 위치를 탭마다 기억한다. 매번 맨 위로 올리면 긴 일정 목록에서
+     지도 한 번 봤다 돌아올 때마다 처음부터 다시 찾아 내려가야 한다. */
+  const prev=document.querySelector('.panel.on');
+  if(prev) scrollMemo[prev.id]=window.scrollY;
   document.querySelectorAll('.panel').forEach(x=>x.classList.toggle('on',x.id==='p-'+t));
-  window.scrollTo({top:0});
+  window.scrollTo({top:scrollMemo['p-'+t]||0});
   if(t==='map'&&map) fitWhenSized();
 }
-document.querySelectorAll('nav button').forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.t)));
+const navBtns=[...document.querySelectorAll('nav button')];
+navBtns.forEach(b=>b.addEventListener('click',()=>showTab(b.dataset.t)));
+/* tablist 는 좌우 화살표로 옮겨 다닐 수 있어야 한다 */
+navBtns.forEach((b,i)=>b.addEventListener('keydown',e=>{
+  const step=e.key==='ArrowRight'?1:e.key==='ArrowLeft'?-1:
+             e.key==='Home'?-i:e.key==='End'?navBtns.length-1-i:0;
+  if(!step&&e.key!=='Home') return;
+  e.preventDefault();
+  const next=navBtns[(i+step+navBtns.length)%navBtns.length];
+  next.focus(); showTab(next.dataset.t);
+}));
 
 const today=new Date(),dep=new Date(2027,1,3);
 const diff=Math.ceil((dep-today)/86400000);
@@ -805,6 +871,7 @@ let curCity='전체', mapFitted=false;
 const CITY_NAMES=['전체','바르셀로나','파리','인터라켄','피렌체','로마'];
 function fit(city){
   curCity=city;
+  clearRoute();
   const set = city==='전체' ? ALL : ALL.filter(l=>l.c===city);
   if(!set.length) return;
   /* 고른 도시를 구글 지도에서 바로 열 수 있게 버튼 주소를 맞춰 둔다 */
@@ -819,34 +886,75 @@ function fit(city){
   if(!map) return;
   map.fitBounds(set.map(l=>[l.lat,l.lng]),{padding:[45,45],maxZoom:14});
 }
-/* 지도가 "실제로 크기를 가진" 순간을 기다렸다가 딱 한 번 맞춘다.
+/* 지도가 "실제로 크기를 가진" 순간을 기다렸다가 콜백을 부른다.
    고정 시간으로 기다리면 안 된다 — 탭이 보이게 된 뒤 120ms 가 지나도
    폭이 0 으로 잡히는 경우가 있었고, 그 상태로 fitBounds 를 하면
    줌이 maxZoom 에 걸려 엉뚱한 곳이 확대된 채 굳는다. */
-function fitWhenSized(){
-  if(mapFitted||!map) return;
-  const tryFit=()=>{
-    if(mapFitted) return true;
-    map.invalidateSize();
-    const s=map.getSize();
-    if(s.x>0&&s.y>0){ mapFitted=true; fit(curCity); return true; }
-    return false;
-  };
-  if(tryFit()) return;
+function whenMapReady(fn){
+  if(!map) return;
+  let done=false, ro=null, timer=null;
+  const ready=()=>{ map.invalidateSize(); const s=map.getSize(); return s.x>0&&s.y>0; };
+  const fire=()=>{ if(done) return; done=true;
+                   if(ro) ro.disconnect(); if(timer) clearInterval(timer); fn(); };
+  if(ready()){ fire(); return; }
   const el=document.getElementById('map');
-  let ro=null;
-  if(window.ResizeObserver&&el){
-    ro=new ResizeObserver(()=>{ if(tryFit()&&ro) ro.disconnect(); });
-    ro.observe(el);
-  }
-  /* 관찰자가 없거나 크기 변화가 한 번도 안 잡히는 경우를 위한 재시도 */
+  if(window.ResizeObserver&&el){ ro=new ResizeObserver(()=>{ if(ready()) fire(); }); ro.observe(el); }
   let n=0;
-  const timer=setInterval(()=>{
-    if(tryFit()||++n>20){ clearInterval(timer); if(ro) ro.disconnect(); }
+  timer=setInterval(()=>{
+    if(ready()) fire();
+    else if(++n>20){ clearInterval(timer); if(ro) ro.disconnect(); }
   },100);
+}
+function fitWhenSized(){
+  if(mapFitted) return;
+  whenMapReady(()=>{ if(mapFitted) return; mapFitted=true; fit(curCity); });
+}
+
+/* 그날 방문 순서를 지도에 선으로 그린다. 동선이 말이 되는지 눈으로 보라고 넣었다. */
+let routeLine=null;
+function clearRoute(){
+  if(routeLine&&map){ map.removeLayer(routeLine); }
+  routeLine=null;
+  const b=document.getElementById('routebar'); if(b) b.hidden=true;
+}
+function showDayRoute(dateStr){
+  const d=DAYS.find(x=>x.d===dateStr);
+  if(!d||d.spots.length<2||d.alt) return;
+  /* showTab 이 부르는 자동 맞춤이 뒤늦게 끼어들어 방금 그린 선을 지우는 일이
+     없도록, 탭을 바꾸기 전에 미리 막아 둔다. */
+  mapFitted=true;
+  showTab('map');
+  whenMapReady(()=>{
+    if(typeof L==='undefined'||!map) return;
+    clearRoute();
+    const stops=d.spots.map(id=>byId[id]).filter(Boolean);
+    const pts=stops.map(l=>[l.lat,l.lng]);
+    if(pts.length<2) return;
+    /* 흰 테두리를 깔고 그 위에 점선을 얹어야 지도 위에서 선이 보인다 */
+    routeLine=L.layerGroup([
+      L.polyline(pts,{color:'#fff',weight:7,opacity:.9}),
+      L.polyline(pts,{color:'#b64f2b',weight:3.5,opacity:1,dashArray:'8 7'})
+    ]);
+    /* 방문 순서를 숫자로 찍는다 — 선만으로는 어느 쪽이 먼저인지 알 수 없다 */
+    stops.forEach((l,i)=>{
+      routeLine.addLayer(L.marker([l.lat,l.lng],{
+        icon:L.divIcon({className:'',html:'<div class="rnum">'+(i+1)+'</div>',
+                        iconSize:[21,21],iconAnchor:[-6,20]}),
+        interactive:false, keyboard:false
+      }));
+    });
+    routeLine.addTo(map);
+    mapFitted=true;                       // 자동 맞춤이 이 화면을 덮어쓰지 않게
+    map.fitBounds(pts,{padding:[55,55],maxZoom:15});
+    const b=document.getElementById('routebar');
+    document.getElementById('routetxt').textContent=
+      d.d+' '+d.w+' · '+d.t+' — 방문 순서 '+d.spots.length+'곳';
+    b.hidden=false;
+  });
 }
 function focusOn(id){
   const l=byId[id]; if(!l||!map) return;
+  mapFitted=true;   // 자동 맞춤이 이 핀 화면을 덮어쓰지 않게
   setTimeout(()=>{map.invalidateSize();map.setView([l.lat,l.lng],15);if(marks[id])marks[id].openPopup();},220);
 }
 window.addEventListener('load',()=>{
