@@ -76,6 +76,12 @@ h2{font-family:var(--serif);font-weight:700;font-size:20px;margin:0 0 14px}
 .droute svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;
             stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
 .droute:hover{border-color:var(--alpine);color:var(--alpine)}
+.printbtn{display:flex;align-items:center;justify-content:center;gap:8px;width:100%;
+           margin:16px 0 4px;padding:12px;background:var(--card);border:1px solid var(--frost);
+           border-radius:10px;color:var(--deep);font:inherit;font-size:13.5px;cursor:pointer}
+.printbtn svg{width:17px;height:17px;stroke:currentColor;fill:none;stroke-width:1.8;
+              stroke-linecap:round;stroke-linejoin:round;flex:0 0 auto}
+.printbtn:hover{border-color:var(--alpine);color:var(--alpine)}
 .bprog{display:flex;align-items:center;gap:11px;margin:0 0 14px}
 .bbar{flex:1;height:6px;border-radius:99px;background:var(--frost);overflow:hidden}
 .bbar i{display:block;height:100%;width:0;background:var(--alpine);border-radius:99px;
@@ -274,6 +280,65 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
   .app{max-width:1080px}
   #map{height:640px}
 }
+
+/* ── 인쇄 ─────────────────────────────────────────────────────────
+   종이로 들고 다닐 일정표. 지도 탭은 통째로 빼고 일정·항공·준비만 싣는다.
+   과거에 인쇄가 깨진 원인 두 가지를 피한다.
+     · 전역 svg 선택자 금지 → 여기서도 클래스로만 지정
+     · Chromium 은 flex 안에서 break-inside:avoid 를 무시 → 행을 display:table 로
+   ───────────────────────────────────────────────────────────── */
+@media print{
+  nav,#p-map,.chips,.tip,.toast,.lb,.caret,.droute,.scards,.bprog,.printbtn,
+  .count,.eyebrow,.seatbox,.csite{display:none !important}
+  :root{--ink:#000;--slate:#333;--paper:#fff;--card:#fff;--frost:#bbb;--soft:#f2f2f2;
+        --alpine:#000;--deep:#000;--ember:#000;--emberbg:#f2f2f2;--moss:#000;--mossbg:#f2f2f2}
+  html,body{background:#fff;color:#000;font-size:10pt;line-height:1.5}
+  body{padding-top:0}
+  .app{max-width:none;padding:0}
+  header{position:static;border-bottom:2px solid #000;padding:0 0 6pt;margin-bottom:10pt}
+  .brand h1{font-size:16pt}
+  /* 모든 탭을 한 장에 이어 붙인다 */
+  .panel{display:block !important;padding-top:14pt;break-before:auto}
+  .panel+.panel{border-top:1px solid #bbb;margin-top:14pt}
+  h2{font-size:13pt;margin:0 0 8pt}
+  /* 펼침 상태와 무관하게 전부 보이게 */
+  .dbody{display:block !important;border-top:1px solid #ddd}
+  .drow{display:table;width:100%;border:0;border-bottom:1px solid #ddd;border-radius:0;
+        margin:0;break-inside:avoid;page-break-inside:avoid}
+  .dhead{display:block;padding:6pt 0 3pt;font-size:11pt}
+  .ddate,.dcity,.dtitle{display:inline;font-size:10.5pt}
+  .dcity{background:none !important;color:#000 !important;border:1px solid #666;
+         border-radius:0;padding:0 4pt;margin:0 5pt}
+  .dbody{padding:0 0 7pt}
+  .dplan{padding:4pt 0 0;font-size:10pt}
+  .dnote,.dopt{background:#f4f4f4 !important;border-left:2pt solid #666;
+               margin-top:5pt;padding:5pt 7pt;font-size:9.5pt;break-inside:avoid}
+  .dopt ul{padding-left:13pt}
+  /* 항공 */
+  .fcard{border:1px solid #999;border-radius:0;padding:8pt;margin-bottom:8pt;break-inside:avoid}
+  .frow{padding:3pt 0;font-size:10pt}
+  .seat{background:none;color:#000;border:1px solid #666;border-radius:0;padding:1pt 5pt}
+  .note{background:#f4f4f4 !important;border-left:2pt solid #666;break-inside:avoid}
+  /* 예약 표 — 종이에서는 체크칸과 링크를 빼고 날짜·항목·설명만 */
+  .btab{border:0;border-radius:0}
+  .btab thead th{background:none;border-bottom:1.5pt solid #000;font-size:8.5pt;padding:4pt 3pt}
+  .btab td{padding:5pt 3pt;border-bottom:1px solid #ddd;font-size:9.5pt}
+  .btab .c2{width:88pt}
+  .bwhen{white-space:normal}
+  /* 종이에서는 손으로 표시할 빈 네모를 남긴다 */
+  .btab .c1{width:22pt}
+  .box{width:11pt;height:11pt;border:1px solid #000;border-radius:0;color:#fff !important;
+       background:none !important}
+  .brow.done .box{background:#000 !important;color:#fff !important}
+  .brow.done .bname{text-decoration:line-through}
+  .bname{font-size:10pt;font-weight:600}
+  .brow{break-inside:avoid}
+  .bdet{display:table-row !important}
+  .bdet td{background:none !important;padding:0 3pt 6pt 3pt;font-size:9pt;color:#333}
+  .guess{background:none;border:1px solid #666;color:#000}
+  a{color:#000;text-decoration:none}
+  @page{margin:14mm 12mm}
+}
 </style>
 </head>
 <body>
@@ -361,6 +426,9 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
   </table>
   <p class="tip">항목 이름을 누르면 자세한 설명이 열립니다. 예약이 빨리 열리는 것부터 정렬했습니다. <b>날짜에 <span style="color:var(--ember)">추정</span>이 붙은 것은 확정 공지가 아니라 "60일 전"처럼 공개된 규칙으로 계산한 값</b>이니 그 무렵 사이트에서 직접 확인하세요.</p>
   <p class="tip"><b>가짜 예매 사이트에 주의하세요.</b> 바티칸·노트르담·오르세는 공식 사이트가 직접 경고를 띄우고 있습니다. 검색해서 나오는 상단 광고가 아니라, 위 항목의 사이트 버튼으로 들어가세요. 특히 <b>노트르담은 입장이 100% 무료</b>라 돈을 받는 곳은 전부 가짜입니다.</p>
+  <button type="button" class="printbtn" id="printbtn">
+    <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 9V3h12v6M6 18H4v-7h16v7h-2"/><rect x="8" y="14" width="8" height="7"/></svg>
+    일정표 인쇄하기</button>
   <p class="tip">조사 시점은 2026년 8월 28일입니다. 요금·정책은 바뀔 수 있습니다. 체크 상태는 이 기기에만 저장됩니다.</p>
 </section>
 </div>
@@ -865,6 +933,7 @@ document.querySelectorAll('.btab .box').forEach(b=>b.addEventListener('click',()
   drawProgress();
 }));
 drawProgress();
+document.getElementById('printbtn').addEventListener('click',()=>window.print());
 document.querySelectorAll('.btab .bname').forEach(b=>b.addEventListener('click',()=>{
   const row=b.closest('.brow'), det=document.getElementById(b.getAttribute('aria-controls'));
   const open=row.classList.toggle('open');
@@ -912,8 +981,12 @@ const CITY_NAMES=['전체','바르셀로나','파리','인터라켄','피렌체'
 function fit(city){
   curCity=city;
   clearRoute();
-  const set = city==='전체' ? ALL : ALL.filter(l=>l.c===city);
-  if(!set.length) return;
+  const all = city==='전체' ? ALL : ALL.filter(l=>l.c===city);
+  if(!all.length) return;
+  /* 화면을 맞출 때는 공항을 뺀다. 로마 피우미치노는 시내에서 25km 라 이것까지
+     담으려다 줌이 10 까지 멀어지고, 그러면 시내 핀 10개가 서로 겹쳐 누를 수가 없다.
+     공항 핀은 지도에 그대로 있고 프레이밍에만 안 쓴다. */
+  const set = all.filter(l=>l.t!=='air').length ? all.filter(l=>l.t!=='air') : all;
   /* 고른 도시를 구글 지도에서 바로 열 수 있게 버튼 주소를 맞춰 둔다 */
   const g=document.getElementById('gmapcity');
   if(g){
@@ -1034,7 +1107,7 @@ window.addEventListener('load',()=>{
 
   const ICON={air:'✈',rail:'🚉',see:'★',stay:'🛏'};
   ALL.forEach(l=>{
-    const m=L.marker([l.lat,l.lng],{icon:L.divIcon({className:'',
+    const m=L.marker([l.lat,l.lng],{riseOnHover:true,icon:L.divIcon({className:'',
       html:'<div class="pin '+l.t+'">'+(ICON[l.t]||'★')+'</div>',iconSize:[26,26],iconAnchor:[13,13]}),title:l.n}).addTo(map);
     m.bindPopup('<b>'+l.n+'</b>'+
       '<a href="'+gPlace(l)+'" target="_blank" rel="noopener">구글지도</a>'+
