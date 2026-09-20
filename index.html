@@ -228,6 +228,7 @@ body.plantab header{position:static}
 .bwhen{font-family:var(--mono);font-size:11.5px;color:var(--alpine);line-height:1.6;white-space:nowrap}
 .bwhen .wd{color:var(--slate)}
 .brow.anytime .bwhen{color:var(--slate)}
+.brow.now .bwhen{font-weight:700}
 .guess{font-style:normal;display:block;width:fit-content;margin-top:4px;font-size:9.5px;
        padding:1px 6px;border-radius:2px;background:var(--emberbg);color:var(--ember)}
 .bname{display:flex;align-items:center;gap:9px;width:100%;font:inherit;font-size:14px;
@@ -508,7 +509,7 @@ nav svg{width:21px;height:21px;stroke:currentColor;fill:none;stroke-width:1.6;st
     </tr></thead>
     <tbody id="todos"></tbody>
   </table>
-  <p class="tip">항목 이름을 누르면 자세한 설명이 열립니다. 예약이 빨리 열리는 것부터 정렬했습니다. <b>날짜에 <span style="color:var(--ember)">추정</span>이 붙은 것은 확정 공지가 아니라 "60일 전"처럼 공개된 규칙으로 계산한 값</b>이니 그 무렵 사이트에서 직접 확인하세요.</p>
+  <p class="tip">항목 이름을 누르면 자세한 설명이 열립니다. 지금 예약할 수 있는 것, 예약이 빨리 열리는 것 순으로 정렬했습니다. <b>날짜에 <span style="color:var(--ember)">추정</span>이 붙은 것은 확정 공지가 아니라 "90일 전"처럼 공개된 규칙으로 계산한 값</b>이니 그 무렵 사이트에서 직접 확인하세요. <b>미정</b>은 아직 2027년 2월분을 팔지 않고 개시일도 공지되지 않은 곳입니다. 판매 상태는 2026-09-19에 각 예매 사이트 달력으로 확인했습니다.</p>
   <p class="tip"><b>가짜 예매 사이트에 주의하세요.</b> 바티칸·노트르담·오르세는 공식 사이트가 직접 경고를 띄우고 있습니다. 검색해서 나오는 상단 광고가 아니라, 위 항목의 사이트 버튼으로 들어가세요. 특히 <b>노트르담은 입장이 100% 무료</b>라 돈을 받는 곳은 전부 가짜입니다.</p>
   <div class="expbtns">
     <button type="button" class="printbtn" id="icsbook">
@@ -741,10 +742,14 @@ const DAYS=[
 ];
 
 /* ── 예약 체크리스트 ──────────────────────────────────────────────
-   open : 예약이 열리는 날. null 이면 상시 구매 가능
-   sure : true  = 운영사·공식 안내에서 확인한 날짜
-          false = 공개된 규칙(60일 전 등)으로 계산한 값 → 그 무렵 확인 필요
-   조사일 2026-08-28. 요금·정책은 바뀔 수 있으니 예약 전 사이트에서 재확인할 것.
+   open : 'YYYY-MM-DD' = 예약이 열리는 날
+          'now' = 이미 2027년 2월분을 팔고 있음
+          'tbd' = 아직 2027년분을 팔지 않고 개시일도 공지 없음
+          null  = 판매 창구 제한이 없거나 미리 살 필요가 없음(상시)
+   sure : true  = 운영사·공식 안내나 예매 사이트 달력에서 확인한 값
+          false = 공개된 규칙(90일 전 등)으로 계산한 값 → 그 무렵 확인 필요
+   조사일 2026-08-28, 판매 상태는 2026-09-19 에 예매 사이트 달력으로 재확인.
+   요금·정책은 바뀔 수 있으니 예약 전 사이트에서 재확인할 것.
    ───────────────────────────────────────────────────────────── */
 const TODOS=[
  {id:'tgv-bcn-par', t:'바르셀로나 → 파리 직행 TGV', open:'2026-09-30', sure:true,
@@ -759,11 +764,11 @@ const TODOS=[
  {id:'train-it', t:'인터라켄 → 피렌체 · 피렌체 → 로마', open:'2026-10-15', sure:false,
   d:'2/12 금(밀라노 경유)과 2/14 일. 이탈리아 구간은 통상 4개월 전후에 열리지만, 12/13 유럽 시각표 변경 뒤에야 풀릴 수 있습니다. 10월 중순부터 수시로 확인하세요. 확정된 개시일이 공개돼 있지 않은 항목입니다.',
   site:'trenitalia.com', url:'https://www.trenitalia.com/en.html'},
- {id:'sagrada', t:'사그라다 파밀리아', open:'2026-12-06', sure:false,
-  d:'2/4 목 오전. 공식 사이트는 약 2개월 전에 표를 풉니다. 온라인 전용이고 이름이 찍히는 표라 나중에 못 바꿉니다. 지정 시간에 늦으면 입장이 거절됩니다. 탑 등반은 별도 요금.',
+ {id:'sagrada', t:'사그라다 파밀리아', open:'tbd', sure:true,
+  d:'2/4 목 오전. 9/19 현재 2026년 12월 31일분까지만 팔고 있고 2027년분은 아직 열리지 않았습니다. 두 달 전에 하루씩 푸는 방식이 아니라 몇 달치를 한꺼번에 푸는 방식이고, 10월 날짜도 이미 절반 넘게 매진입니다. 개시일 공지가 없으니 10월부터 매주 들어가 보고 1·2월이 열리면 바로 잡으세요. 온라인 전용이고 이름이 찍히는 표라 나중에 못 바꿉니다. 지정 시간에 늦으면 입장이 거절됩니다. 탑 등반은 별도 요금.',
   site:'sagradafamilia.org', url:'https://sagradafamilia.org/en/tickets'},
- {id:'eiffel', t:'에펠탑 전망대', open:'2026-12-09', sure:false,
-  d:'2/7 일 저녁. 엘리베이터 표는 60일 전에 열립니다. 저녁 시간대가 먼저 찹니다.',
+ {id:'eiffel', t:'에펠탑 전망대', open:'2026-11-09', sure:false,
+  d:'2/7 일 저녁. 공식 판매처 안내는 "예외를 빼면 엘리베이터 표는 방문 90일 전부터 온라인 판매"라서 11/9로 잡았습니다. 다만 9/19 현재 달력이 10/31까지만 열려 있어 규칙보다 늦게 풀리고 있습니다. 11/9에 2월이 안 보이면 며칠 간격으로 다시 확인하세요. 저녁 시간대가 먼저 찹니다.',
   site:'ticket.toureiffel.paris', url:'https://ticket.toureiffel.paris/en'},
  {id:'vatican', t:'바티칸 박물관', open:'2026-12-17', sure:true,
   d:'2/15 월. 60일 전에 열립니다. 현장 판매가 없어 온라인 예약이 필수입니다. 공식 주소와 비슷한 사기 사이트가 많으니 반드시 아래 주소로 들어가세요.',
@@ -774,29 +779,29 @@ const TODOS=[
  {id:'notredame', t:'노트르담 대성당 (무료)', open:'2027-02-06', sure:true,
   d:'2/8 월 아침. 입장 무료입니다. 무료 시간대 예약은 방문 2일 전에 열리고 금방 나갑니다. 2월은 비수기라 예약 없이 가도 대기 5~20분 수준이니 부담 갖지 않으셔도 됩니다. 공식 사이트가 직접 경고하고 있습니다 — 입장은 100% 무료이고 예약은 공식 사이트에서만 받으며, 표를 파는 제3자 사이트는 전부 가짜입니다. 종탑과 지하 유적은 별도 표가 필요합니다.',
   site:'notredamedeparis.fr', url:'https://www.notredamedeparis.fr/en/visit/reservation-free/'},
- {id:'casabatllo', t:'카사 바트요', open:null, sure:true,
-  d:'2/5 금 오후. 판매 창구 제한이 없어 지금도 예약할 수 있습니다. 사그라다를 잡는 날 함께 처리하면 편합니다.',
+ {id:'casabatllo', t:'카사 바트요', open:'tbd', sure:true,
+  d:'2/5 금 오후. 9/19 현재 예매 달력이 2026년 12월까지만 열려 있고, 2027년분 개시일은 공지가 없습니다. 10월부터 가끔 들어가 1·2월로 넘어가는지 확인하세요. 사그라다와 비슷한 시기에 풀릴 가능성이 있어 두 곳을 같이 보면 편합니다.',
   site:'casabatllo.es', url:'https://www.casabatllo.es/en/online-tickets/'},
- {id:'palau', t:'팔라우 데 라 무지카', open:null, sure:true,
-  d:'2/5 금 오전. 가이드투어로만 들어갈 수 있어 인원이 제한됩니다. 이날 도심 동선의 출발점이라 오전 투어로 잡으세요.',
-  site:'entrades.palaumusica.cat', url:'https://entrades.palaumusica.cat/content'},
- {id:'guell', t:'구엘 공원', open:null, sure:true,
-  d:'2/4 목 오후. 시간 지정 입장입니다. 사그라다·산 파우와 같은 북쪽 동선으로 묶었습니다.',
+ {id:'palau', t:'팔라우 데 라 무지카', open:'now', sure:true,
+  d:'2/5 금 오전. 가이드투어로만 들어갈 수 있어 인원이 제한됩니다. 이미 2027년 3월분까지 팔고 있고, 2/5 회차가 예약 가능한 것을 9/19에 확인했습니다. 투어 언어마다 시작 시간이 달라서 영어 회차는 예매 화면에서 언어를 고른 뒤 시간을 보세요. 이날 도심 동선의 출발점이라 가능하면 오전 회차로 잡으세요. (공연 예매 사이트 entrades.palaumusica.cat 이 아니라 아래 투어 예매 사이트입니다.)',
+  site:'tickets.palaumusica.cat', url:'https://tickets.palaumusica.cat/en/513-tours/3011-guided-visit'},
+ {id:'guell', t:'구엘 공원', open:'2026-11-06', sure:true,
+  d:'2/4 목 오후. 시간 지정 입장입니다. 공식 예매 사이트 달력이 오늘부터 90일 뒤까지만 열리게 설정돼 있어서 2/4분은 11/6부터 살 수 있습니다. 사그라다·산 파우와 같은 북쪽 동선으로 묶었습니다.',
   site:'parkguell.barcelona', url:'https://parkguell.barcelona/en/buy-tickets'},
- {id:'picasso', t:'피카소 미술관', open:null, sure:true,
-  d:'2/5 금. 월요일 휴관이라 금요일인 이날은 열립니다. 하루 입장 인원을 제한해 주말·성수기에는 미리 매진되니 온라인으로 잡아 두세요(온라인 14유로, 현장 15유로). 참고로 2월에는 목요일 16~19시가 무료인데, 그 목요일(2/4)은 북쪽 동선이라 도심으로 되돌아와야 합니다. 무료를 노리시려면 4일 전 오전 10시부터 예약이 열립니다.',
+ {id:'picasso', t:'피카소 미술관', open:'tbd', sure:true,
+  d:'2/5 금. 월요일 휴관이라 금요일인 이날은 열립니다. 9/19 현재 2026년 12월 31일분까지만 팔고 있어 2월분은 아직 살 수 없고, 개시일 공지도 없습니다. 하루 입장 인원을 제한해 주말·성수기에는 미리 매진되니 열리면 온라인으로 잡아 두세요(온라인 14유로, 현장 15유로). 참고로 2월에는 목요일 16~19시가 무료인데, 그 목요일(2/4)은 북쪽 동선이라 도심으로 되돌아와야 합니다. 무료를 노리시려면 4일 전 오전 10시부터 예약이 열립니다.',
   site:'museupicassobcn.cat', url:'https://museupicassobcn.cat/en/plan-your-visit/buy-tickets-and-opening-hours'},
- {id:'orsay', t:'오르세 미술관', open:null, sure:true,
-  d:'2/7 일은 2027년 2월의 첫째 일요일입니다. 오르세는 이날 입장이 무료인 대신 시간 예약이 의무입니다. 평소에는 예약이 선택이지만 이날만은 예약 없이 못 들어갑니다. 무료인 만큼 자리가 빨리 차니 열리는 대로 잡으세요.',
+ {id:'orsay', t:'오르세 미술관', open:'tbd', sure:true,
+  d:'2/7 일은 2027년 2월의 첫째 일요일입니다. 오르세는 이날 입장이 무료인 대신 시간 예약이 의무입니다. 평소에는 예약이 선택이지만 이날만은 예약 없이 못 들어갑니다. 무료 예약은 바로 다음 첫째 일요일 한 회차만 열려 있고, 9/19에 보니 10/4분이 벌써 매진이었습니다. 지금까지는 이틀 전 금요일 오전 11시(파리 시간)에 추가분이 풀렸습니다. 2/7분이 언제 열리는지는 공지가 없으니 1월 초부터 확인하고, 놓치면 2/5(금) 11시 추가분을 노리세요. 유료 시간 지정 표도 지금은 2027년 1월 31일분까지만 팝니다.',
   site:'billetterie.musee-orsay.fr', url:'https://billetterie.musee-orsay.fr/en-GB/'},
- {id:'uffizi', t:'우피치 미술관', open:null, sure:false,
-  d:'2/13 토. 이름이 찍히는 표이고 시간 예약이 필수입니다. 공식 오픈 시점이 공개돼 있지 않으니 12월부터 확인하세요. 미리 사면 29유로, 당일 현장은 25유로입니다.',
+ {id:'uffizi', t:'우피치 미술관', open:'tbd', sure:true,
+  d:'2/13 토. 이름이 찍히는 표이고 시간 예약이 필수입니다. 9/19 현재 2026년 12월 31일분까지만 팔고 있고 2027년분 개시일은 공지가 없습니다. 올해 4~12월분은 미리 공지한 뒤 2월 2일에 한꺼번에 풀었습니다. 11월부터 예매 사이트 공지를 확인하세요. 미리 사면 29유로, 당일 현장은 25유로입니다.',
   site:'tickets.uffizi.it', url:'https://tickets.uffizi.it/'},
- {id:'duomo', t:'피렌체 두오모', open:null, sure:false,
-  d:'2/13 토. 성당 본당은 무료지만 줄을 섭니다. 돔에 오르려면 브루넬레스키 패스와 시간 예약이 필요한데 2~4주 전에 매진되곤 하니 늦어도 1월 중순에는 잡으세요. 돔은 엘리베이터 없이 463계단이라 부모님께는 종탑이나 생략을 권합니다.',
+ {id:'duomo', t:'피렌체 두오모', open:'now', sure:false,
+  d:'2/13 토. 성당 본당은 무료지만 줄을 섭니다. 돔에 오르려면 브루넬레스키 패스와 시간 예약이 필요합니다. 예매 화면의 날짜 선택이 1년 뒤(2027-09-19)까지 열려 있어 패스는 지금 살 수 있는 것으로 보이지만, 2/13 돔 시간대가 실제로 떠 있는지는 확인하지 못했습니다. 2~4주 전에 매진되곤 하니 늦어도 1월 중순에는 잡으세요. 돔은 엘리베이터 없이 463계단이라 부모님께는 종탑이나 생략을 권합니다.',
   site:'tickets.duomo.firenze.it', url:'https://tickets.duomo.firenze.it/en/store'},
  {id:'jungfrau', t:'융프라우요흐', open:null, sure:true,
-  d:'2/10 수 또는 2/11 목. 좌석 예약 의무는 5~10월에만 적용되므로 겨울에는 미리 사둘 필요가 없습니다. 당일 아침 정상 날씨를 보고 사시면 됩니다. 스위스 트래블 패스는 25%, 반액 카드는 50% 할인이니 패스 구매 여부만 미리 계산해 두세요.',
+  d:'2/10 수 또는 2/11 목. 좌석 예약 의무는 5~10월에만 적용되므로 겨울에는 미리 사둘 필요가 없습니다. 당일 아침 정상 날씨를 보고 사시면 됩니다. 겨울에도 붐비는 날이 있어 공식 사이트는 좌석 예약(1인 10프랑)을 권합니다. 스위스 트래블 패스는 25%, 반액 카드는 50% 할인이니 패스 구매 여부만 미리 계산해 두세요.',
   site:'jungfrau.ch', url:'https://www.jungfrau.ch/en-gb/jungfraujoch-top-of-europe/'}
 ];
 
@@ -1103,17 +1108,21 @@ const WD='일월화수목금토';
    부분(등록 도메인)은 그대로 남는다. 링크 주소 자체는 손대지 않는다. */
 const shortSite = n =>
   n.replace(/^(tickets?|ticketing|billetterie|entrades|www)\./,'');
+const isDate = t => /^\d{4}-\d\d-\d\d$/.test(t.open||'');
 function whenCell(t){
+  if(t.open==='now') return '지금 가능'+(t.sure?'':'<i class="guess">확인 필요</i>');
+  if(t.open==='tbd') return '미정';
   if(!t.open) return '상시';
   const [y,m,d]=t.open.split('-').map(Number);
   return t.open+' <span class="wd">('+WD[new Date(y,m-1,d).getDay()]+')</span>'
        + (t.sure?'':'<i class="guess">추정</i>');
 }
-/* 예약이 빨리 열리는 것부터. 상시 항목은 뒤로 */
+/* 지금 살 수 있는 것 → 날짜가 빠른 것 → 미정 → 상시 */
+const TRANK = t => t.open==='now'?0 : isDate(t)?1 : t.open==='tbd'?2 : 3;
 const TSORT=TODOS.slice().sort((a,b)=>
-  (a.open?0:1)-(b.open?0:1) || (a.open||'').localeCompare(b.open||''));
+  TRANK(a)-TRANK(b) || (isDate(a)&&isDate(b) ? a.open.localeCompare(b.open) : 0));
 document.getElementById('todos').innerHTML=TSORT.map(t=>
- '<tr class="brow'+(saved[t.id]?' done':'')+(t.open?'':' anytime')+'" data-id="'+t.id+'">'+
+ '<tr class="brow'+(saved[t.id]?' done':'')+(isDate(t)||t.open==='now'?'':' anytime')+(t.open==='now'?' now':'')+'" data-id="'+t.id+'">'+
    '<td class="bchk"><button type="button" class="box" role="checkbox" aria-checked="'+
      (saved[t.id]?'true':'false')+'" aria-label="'+t.t+' 예약 완료">✓</button></td>'+
    '<td class="bwhen">'+whenCell(t)+'</td>'+
@@ -1194,7 +1203,7 @@ function nextDay(iso){
 }
 /* 예약 캘린더 — 날짜가 정해진 항목만 */
 function exportBookings(){
-  const ev=TODOS.filter(t=>t.open).map(t=>({
+  const ev=TODOS.filter(isDate).map(t=>({
     uid:'booking-'+t.id, allDay:true, start:ymd(t.open), end:nextDay(t.open),
     title:'예약 시작 · '+t.t+(t.sure?'':' (추정)'),
     desc:t.d+'\n\n예매처: '+t.site+'\n'+t.url+
